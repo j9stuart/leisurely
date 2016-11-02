@@ -1,0 +1,40 @@
+1,1,Festivals,Festival,NULL
+2,1,Concerts,Performance,NULL
+3,1,Meetups,Music,NULL
+4,1,Dance Parties,Party,NULL
+5,1,Classes,Class,NULL
+6,2,Networking,Networking,NULL
+7,2,Seminars,Seminar,NULL
+8,2,Meetups,Career & Business,NULL
+9,2,Conferences,Conference,NULL
+10,2,Classes,Class,NULL
+11,3,Classes,Class,NULL
+12,3,Festivals,Festival,NULL
+13,3,Meetups,Food & Drink,NULL
+14,3,Beer,NULL,Beer
+15,3,Wine,NULL,Wine
+16,4,Performance,Performance,NULL
+17,4,Classes,Class,NULL
+18,4,Meetups,Arts & Culture,NULL
+19,4,Festivals,Festival,NULL
+20,4,Seminars,Seminar,NULL
+21,5,Classes,Class,NULL
+22,5,Races,Race,NULL
+23,5,Meetups,Sports & Recreation,NULL
+24,5,Games,Game,NULL
+25,5,SF.Funcheap,Sports & Fitness,NULL
+26,6,Classes,Class,NULL
+27,6,Conferences,Conference,NULL
+28,6,Meetups,Tech,NULL
+29,6,Networking,Networking,NULL
+30,6,Seminars,Seminar,NULL
+31,7,Hiking,NULL,Hiking
+32,7,Tours,Tour,NULL
+33,7,Meetups,Outdoors & Adventure,NULL
+34,7,Classes,Class,NULL
+35,7,Retreats,Retreat,NULL
+36,8,Education,NULL,Education
+37,8,The Environment,NULL,Environment
+38,8,Poverty Alleviation,NULL,Poverty
+39,8,Animal Welfare,NULL,Animal Welfare
+40,8,Human Rights,NULL,Human Rights
