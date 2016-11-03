@@ -1,11 +1,17 @@
 <!doctype html>
 <html>
-<head>
-  <title>{% block title %}Leisurely{% endblock %}</title>
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
-  <link rel="stylesheet" href="bootstrap.css">
-</head>
-<body>
+  <head>
+    <title>{% block title %}Leisurely{% endblock %}</title>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+
+    <link rel="stylesheet" href="bootstrap.css">
+
+  </head>
+  <body>
+
+    <script src="http://code.jquery.com/jquery.js"></script>
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
 
         <!-- Show flashed messages -->
     {% with messages = get_flashed_messages() %}
@@ -16,9 +22,7 @@
       {% endif %}
     {% endwith %} 
 
-  {% block content %} BODY CONTENT GOES HERE {% endblock %}
+    {% block content %} BODY CONTENT GOES HERE {% endblock %}
 
-  <script src="http://code.jquery.com/jquery.js"></script>
-  <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
-</body>
+  </body>
 </html>

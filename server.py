@@ -42,16 +42,21 @@ def index():
     weekday = Weekday.query.get(weekday)
     category_list = []
     for category in weekday.categories:
-        category_name = category.name
+        category_name = category.screenname
         category_list.append(category_name)
     
     print category_list
         # Generate a random list of 5 categories from list
-    d1, d2, d3, d4, d5 = random.sample(category_list, 5) 
+    c1, c2, c3, c4, c5 = random.sample(category_list, 5) 
     
     return render_template("homepage.html", 
-                            d1=d1, d2=d2,
-                            d3=d3, d4=d4, d5=d5)
+                            c1=c1, c2=c2,
+                            c3=c3, c4=c4, c5=c5)
+
+
+@app.route('/activities')
+def show_activities():
+    """This displays a list of activities based on the user selected category"""
 
 
 @app.route('/event-list')
