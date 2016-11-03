@@ -6,6 +6,7 @@ import sys
 import json
 from pprint import pprint
 import requests
+import datetime
 
 auth_token = environ['EVENTBRITE_OAUTH_TOKEN']
 pusher_app_id = environ['PUSHER_APP_ID']
@@ -20,6 +21,8 @@ eventbrite = eventbrite.Eventbrite(auth_token)
 p = pusher.Pusher(app_id=pusher_app_id, key=pusher_key, secret=pusher_secret)
 
 def get_event_list():
-    event = eventbrite.get('/categories')
-    event = event.pretty
-    print event
+    # Get today's date
+    today = datetime.datetime.today()
+    # Get the day of the week where Monday = 1
+    weekday = today.isoweek.day()
+    

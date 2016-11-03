@@ -55,7 +55,7 @@ def load_weekdays():
                             name=name,)
 
         # Need to add to session to store 
-        db.session.add(category)
+        db.session.add(weekday)
 
     # Commit my work
 
@@ -74,13 +74,14 @@ def load_weekdaycategory():
     # Read category.csv file and insert data
     for row in open("seed_data/weekdaycategory.csv"):
         row = row.rstrip()
-        weekday_category_id, name = row.split(",")
+        weekday_category_id, cat_id, weekday_id = row.split(",")
 
         weekday_category = WeekdayCategory(weekday_category_id=weekday_category_id, 
-                                           name=name,)
+                                           cat_id=cat_id,
+                                           weekday_id=weekday_id)
 
         # Need to add to session to store 
-        db.session.add(category)
+        db.session.add(weekday_category)
 
     # Commit my work
 
@@ -101,18 +102,19 @@ def load_activities():
         row = row.rstrip()
         act_id, cat_id, name, act_type, sub_cat = row.split(",")
 
-        category = Category(act_id=act_id, 
+        activity = Activity(act_id=act_id, 
                             cat_id=cat_id,
                             name=name,
                             act_type=act_type,
                             sub_cat=sub_cat)
 
         # Need to add to session to store 
-        db.session.add(category)
+        db.session.add(activity)
 
     # Commit my work
 
     db.session.commit()
+
 
 if __name__ == "__main__":
     connect_to_db(app)

@@ -9,6 +9,8 @@ from pprint import pprint
 import requests
 from jinja2 import StrictUndefined
 import datetime
+import random
+from model import connect_to_db, db, Category, Weekday, WeekdayCategory, Activity
 
 auth_token = environ['EVENTBRITE_OAUTH_TOKEN']
 pusher_app_id = environ['PUSHER_APP_ID']
@@ -28,19 +30,30 @@ app.jinja_env.undefined = StrictUndefined
 app.secret_key = "leisure"
 
 
-def get_event_list():
-    event = eventbrite.get('/categories')
-    event = event.pretty
-    print event
-
-
 @app.route('/')
 def index():
     """This the app homepage view"""
 
+    # Get today's date
+    today = datetime.datetime.today()
+    # Get the day of the week where Monday = 1
+    weekday = today.isoweekday()
+    print type(weekday)
+    # Query database to get weekday categories
+    weekday = Weekday.query.get(weekday)
+    print weekday
+    category_list = []
+    for category in weekday.categories:
+        category_list.append(category.name)
+        return category_list
 
+    # Generate a random list of 5 categories from list
+    d1, d2, d3, d4, d5 = random.sample(category_list, 5) 
 
-    return render_template("homepage.html")
+    return render_template("homepage.html", 
+                            d1=d1, d2=d2,
+                            d3=d3, d4=d4, d5=d5)
+
 
 @app.route('/event-list')
 def show_event_list():
@@ -48,7 +61,9 @@ def show_event_list():
 
     #Get event details
     event = eventbrite.get('/categories')
+    event = event.pretty
     return event
+
 
 if __name__ == "__main__":
     app.debug = True

@@ -7,7 +7,7 @@ db = SQLAlchemy()
 class Category(db.Model):
     """Categories from Eventbrite API"""
 
-    __tablename__ = "categories"
+    __tablename__ = "categories"   
 
     cat_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     name = db.Column(db.String(80), nullable=False)
@@ -73,7 +73,7 @@ def connect_to_db(app):
     """Connect the database to our Flask app."""
 
     # Configure the PstgreSQL database
-    app.config['SQLAlchemy_DATABASE_URI'] = 'postgresql:///leisurely'
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///leisurely'
     db.app = app
     db.init_app(app)
 
