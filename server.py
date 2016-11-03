@@ -38,18 +38,17 @@ def index():
     today = datetime.datetime.today()
     # Get the day of the week where Monday = 1
     weekday = today.isoweekday()
-    print type(weekday)
     # Query database to get weekday categories
     weekday = Weekday.query.get(weekday)
-    print weekday
     category_list = []
     for category in weekday.categories:
-        category_list.append(category.name)
-        return category_list
-
-    # Generate a random list of 5 categories from list
+        category_name = category.name
+        category_list.append(category_name)
+    
+    print category_list
+        # Generate a random list of 5 categories from list
     d1, d2, d3, d4, d5 = random.sample(category_list, 5) 
-
+    
     return render_template("homepage.html", 
                             d1=d1, d2=d2,
                             d3=d3, d4=d4, d5=d5)
@@ -68,6 +67,7 @@ def show_event_list():
 if __name__ == "__main__":
     app.debug = True
     app.jinja_env.auto_reload = True
+    connect_to_db(app)
 
     DebugToolbarExtension(app)
     app.run(host='0.0.0.0', debug=True)
