@@ -33,39 +33,44 @@ app.secret_key = "leisure"
 @app.route('/')
 def index():
     """This the app homepage view"""
-
+    category_list = {}
+    activity_list = []
     # Get today's date
-    today = datetime.datetime.today()
+    weekday = datetime.datetime.today().isoweekday()
     # Get the day of the week where Monday = 1
-    weekday = today.isoweekday()
-    # Query database to get weekday categories
+    # Query database to get weekday categories and their associated activities
     weekday = Weekday.query.get(weekday)
-    category_list = []
     for category in weekday.categories:
         category_name = category.screenname
-        category_list.append(category_name)
+        activities = Category.query.filter_by(screenname=category_name).one().activities
+        for activity in activities:
+            activity_list.append(activity.name)
+        category_list[category_name] = activity_list
+        activity_list = []
 
-    # Generate a random list of 5 categories from list
-    c1, c2, c3, c4, c5 = random.sample(category_list, 5) 
-    
+    # Generate a random list of 5 categories to dispaly from dictionary
+    c1, c2, c3, c4, c5 = random.sample(category_list.items(), 5) 
+    weekday = weekday.name
+
+
     return render_template("homepage.html", 
                             c1=c1, c2=c2,
-                            c3=c3, c4=c4, c5=c5)
+                            c3=c3, c4=c4, c5=c5, weekday=weekday)
 
 
-@app.route('/activities', methods=["POST"])
+@app.route('/activities')
 def show_activities():
     """This displays a list of activities based on the user selected category"""
 
-    screenname = request.form.get("category")
+    screenname = request.args.get("category")
     # Query database to get category in order to get activities
     category = Category.query.filter_by(screenname=screenname).one()
-    activity_list = []
+    activity_list = {}
     for activity in category.activities:
         activity_name = activity.name
-        activity_list.append(activity_name)
+        activity_list[activity_name] = activity_name
 
-    return activity_list
+    return jsonify(activity_list)
 
 
 @app.route('/event-list')

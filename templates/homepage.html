@@ -35,24 +35,24 @@
   </nav>
 
   <!-- Category Buttons -->
-  <div id="mood-message">What are you in the mood for?</div>
+  <div id="mood-message">Today is {{ weekday }} <br> What are you in the mood for?</div>
   <br>
-  <form id="cat-form" class="btn-group btn-group-justified" action="/activities" method="POST">
+  <form id="cat-form" class="btn-group btn-group-justified" action="/activities">
     <div class="btn-group btn-group-justified" id="categories" role="group">
       <div class="btn-group" role="group">
-        <button  class="btn btn-default" name="category" type="submit" id="c1" value="{{ c1 }}" >{{ c1 }}</button>
+        <button type="submit" class="btn btn-default" name="category" id="c1" value="{{ c1 }}">{{ c1[0] }}</button>
       </div>
       <div class="btn-group" role="group">
-        <button type="submit" class="btn btn-default" name="category" id="c2" value="{{ c2 }}">{{ c2 }}</button>
+        <button type="submit" class="btn btn-default" name="category" id="c2" value="{{ c2 }}">{{ c2[0] }}</button>
       </div>
       <div class="btn-group" role="group">
-        <button type="submit" class="btn btn-default" name="category" id="c3" value="{{ c3 }}">{{ c3 }}</button>
+        <button type="submit" class="btn btn-default" name="category" id="c3" value="{{ c3 }}">{{ c3[0] }}</button>
       </div>
       <div class="btn-group" role="group">
-        <button type="submit" class="btn btn-default" name="category" id="c4" value="{{ c4 }}">{{ c4 }}</button>
+        <button type="submit" class="btn btn-default" name="category" id="c4" value="{{ c4 }}">{{ c4[0] }}</button>
       </div>
       <div class="btn-group" role="group">
-        <button type="submit" class="btn btn-default" name="category" id="c5" value="{{ c5 }}">{{ c5 }}</button>
+        <button type="submit" class="btn btn-default" name="category" id="c5" value="{{ c5 }}">{{ c5[0] }}</button>
       </div>
     </div>
   </form>
