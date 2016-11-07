@@ -21,8 +21,28 @@ eventbrite = eventbrite.Eventbrite(auth_token)
 p = pusher.Pusher(app_id=pusher_app_id, key=pusher_key, secret=pusher_secret)
 
 def get_event_list():
-    # Get today's date
-    today = datetime.datetime.today()
-    # Get the day of the week where Monday = 1
-    weekday = today.isoweek.day()
     
+    category_list = {}
+    activity_list = []
+    # Get today's date
+    weekday = datetime.datetime.today().isoweekday()
+    # Get the day of the week where Monday = 1
+    # Query database to get weekday categories and their associated activities
+    weekday = Weekday.query.get(weekday)
+    for category in weekday.categories:
+        category_name = category.screenname
+        activities = Category.query.filter_by(screenname=category_name).one().activities
+        for activity in activities:
+            activity_list.append(activity.name)
+        category_list[category_name] = activity_list
+        activity_list = []
+
+    # Generate a random list of 5 categories to dispaly from dictionary
+    c1, c2, c3, c4, c5 = random.sample(category_list.items(), 5) 
+    weekday = weekday.name
+    category_json = json.dumps(category_list)
+
+
+    return render_template("homepage.html", 
+                            c1=c1, c2=c2,
+                            c3=c3, c4=c4, c5=c5, weekday=weekday, category_json=category_json)
