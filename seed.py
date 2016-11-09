@@ -100,13 +100,16 @@ def load_activities():
     # Read category.csv file and insert data
     for row in open("seed_data/activities.csv"):
         row = row.rstrip()
-        act_id, cat_id, name, act_type, sub_cat = row.split(",")
+        act_id, cat_id, eb_cat_id, name, act_type, eb_format_id, sub_cat, mu_id = row.split(",")
 
         activity = Activity(act_id=act_id, 
                             cat_id=cat_id,
+                            eb_cat_id=eb_cat_id,
                             name=name,
                             act_type=act_type,
-                            sub_cat=sub_cat)
+                            eb_format_id=eb_format_id,
+                            sub_cat=sub_cat,
+                            mu_id=mu_id)
 
         # Need to add to session to store 
         db.session.add(activity)

@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <div>
+    <h2>Take your pick:</h2>
+      <ul>
+        {% for event in event_details %}
+          <li>
+            <a href="{{ event[1] }}">Title: {{ event[0] }}</a>
+          </li>
+        {% endfor %}
+      </ul> 
+  </div>
+
+ 
+{% endblock %}

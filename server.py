@@ -11,14 +11,17 @@ from jinja2 import StrictUndefined
 import datetime
 import random
 from model import connect_to_db, db, Category, Weekday, WeekdayCategory, Activity
+import meetup.api
 
 auth_token = environ['EVENTBRITE_OAUTH_TOKEN']
 pusher_app_id = environ['PUSHER_APP_ID']
 pusher_key = environ['PUSHER_KEY']
 pusher_secret = environ['PUSHER_SECRET']
+mu_token = environ['MEETUP_API_KEY']
 
-# Instantiate the Eventbrite API client.
+# Instantiate the Eventbrite and Meetup API clients.
 eventbrite = eventbrite.Eventbrite(auth_token)
+meetup = meetup.api.Client(mu_token)
 
 #Instantiate the pusher object. The pusher library pushes actions to the browser
 # when they occur. 
@@ -60,20 +63,12 @@ def show_activities():
     """This displays a list of activities based on the user selected category"""
 
     screenname = request.args.get('category')
-    print screenname
     # Query database to get category in order to get activities
     category = Category.query.filter_by(screenname=screenname).one()
     activity_list = {}
     for activity in category.activities:
         activity_name = activity.name
-        activity_list[activity_name] = activity_name
-
-        # activity_list.append(activity_name)
-
-    # return render_template("activities.html", 
-    #                         a1=a1, a2=a2,
-    #                         a3=a3, a4=a4, a5=a5, 
-    print activity_list
+        activity_list[activity_name] = activity.act_id
 
     return jsonify(activity_list)
 
@@ -82,12 +77,57 @@ def show_activities():
 @app.route('/event-list')
 def show_event_list():
     """This displays a list of events"""
+    # Get data from browser
+    act_id = request.args.get('category')
+    activity = Activity.query.filter_by(act_id=act_id).one()
+    eb_cat_id = activity.eb_cat_id
+    eb_format_id = activity.eb_format_id
+    eb_sub_id = activity.sub_cat
+    mu_id = activity.mu_id
+    event_details = []
 
-    event_type = request.args.get('event-cat')
-    #Get event details
-    event = eventbrite.get('/categories')
-    event = event.pretty
-    return event
+    print act_id
+    print eb_cat_id
+    print eb_format_id
+    print eb_sub_id 
+    print mu_id   
+
+    if mu_id != 0:
+        events = meetup.GetOpenEvents(category=mu_id, zip=94122)
+        for event in events.results:
+            event_name = event.get("name")
+            event_url = event.get("event_url")
+            event_deets = (event_name, event_url)
+            event_details.append(event_deets)
+
+        return render_template("meetup_events.html",
+                                event_details=event_details)
+
+    else:
+        if eb_sub_id != str(0):
+            events = eventbrite.get("/events/search/?categories="+str(eb_cat_id)+"&subcategories="+eb_sub_id)
+        else:
+            events = eventbrite.get("/events/search/?categories="+str(eb_cat_id)+"&formats="+str(eb_format_id))
+
+        print pprint(events)
+
+        if events.get("events") == []:
+            flash('Sorry there are no events at this time!')
+            return redirect("/")
+
+        else:
+            event_list = events.get("events")
+            for event in event_list:
+                event_name_dict = event.get("name")
+                event_name = event_name_dict.get("text")
+                event_url = event.get("url")
+                event_deets = (event_name, event_url)
+                event_details.append(event_deets)
+    
+            return render_template("eventbevents.html",
+                                event_details=event_details)
+
+
 
 
 if __name__ == "__main__":

@@ -1,40 +1,39 @@
-1,1,Festivals,Festival,NULL
-2,1,Concerts,Performance,NULL
-3,1,Meetups,Music,NULL
-4,1,Dance Parties,Party,NULL
-5,1,Classes,Class,NULL
-6,2,Networking,Networking,NULL
-7,2,Seminars,Seminar,NULL
-8,2,Meetups,Career & Business,NULL
-9,2,Conferences,Conference,NULL
-10,2,Classes,Class,NULL
-11,3,Classes,Class,NULL
-12,3,Festivals,Festival,NULL
-13,3,Meetups,Food & Drink,NULL
-14,3,Beer,NULL,Beer
-15,3,Wine,NULL,Wine
-16,4,Performance,Performance,NULL
-17,4,Classes,Class,NULL
-18,4,Meetups,Arts & Culture,NULL
-19,4,Festivals,Festival,NULL
-20,4,Seminars,Seminar,NULL
-21,5,Classes,Class,NULL
-22,5,Races,Race,NULL
-23,5,Meetups,Sports & Recreation,NULL
-24,5,Games,Game,NULL
-25,5,SF.Funcheap,Sports & Fitness,NULL
-26,6,Classes,Class,NULL
-27,6,Conferences,Conference,NULL
-28,6,Meetups,Tech,NULL
-29,6,Networking,Networking,NULL
-30,6,Seminars,Seminar,NULL
-31,7,Hiking,NULL,Hiking
-32,7,Tours,Tour,NULL
-33,7,Meetups,Outdoors & Adventure,NULL
-34,7,Classes,Class,NULL
-35,7,Retreats,Retreat,NULL
-36,8,Education,NULL,Education
-37,8,The Environment,NULL,Environment
-38,8,Poverty Alleviation,NULL,Poverty
-39,8,Animal Welfare,NULL,Animal Welfare
-40,8,Human Rights,NULL,Human Rights
+1,1,103,Festivals,Festival,5,0,0
+2,1,103,Concerts,Performance,6,0,0
+3,1,103,Meetups,Music,0,0,21
+4,1,103,Dance Parties,Party,11,0,0
+5,1,103,Classes,Class,9,0,0
+6,2,101,Networking,Networking,10,0,0
+7,2,101,Seminars,Seminar,2,0,0
+8,2,101,Meetups,Career & Business,0,0,2
+9,2,101,Conferences,Conference,1,0,0
+10,2,101,Classes,Class,9,0,0
+11,3,110,Classes,Class,9,0,0
+12,3,110,Festivals,Festival,5,0,0
+13,3,110,Meetups,Food & Drink,0,0,10
+14,3,110,Beer,NULL,0,10001,0
+15,3,110,Wine,NULL,0,10002,0
+16,4,105,Performance,Performance,6,0,0
+17,4,105,Classes,Class,9,0,0
+18,4,105,Meetups,Arts & Culture,0,0,1
+19,4,105,Festivals,Festival,5,0,0
+20,4,105,Seminars,Seminar,2,0,0
+21,5,108,Classes,Class,9,0,0
+22,5,108,Running,Race,15,0,0
+23,5,108,Meetups,Sports & Recreation,0,0,32
+24,5,108,Games & Events,Game,14,0,0
+26,6,102,Classes,Class,9,0,0
+27,6,102,Conferences,Conference,1,0,0
+28,6,102,Meetups,Tech,0,0,34
+29,6,102,Networking,Networking,10,0,0
+30,6,102,Seminars,Seminar,2,0,0
+31,7,109,Hiking,NULL,0,9001,0
+32,7,109,Tours,Tour,16,0,0
+33,7,109,Meetups,Outdoors & Adventure,0,0,23
+34,7,109,Classes,Class,9,0,0
+35,7,109,Retreats,Retreat,18,0,0
+36,8,111,Education,NULL,0,11008,0
+37,8,111,The Environment,NULL,0,11002,0
+38,8,111,Poverty Alleviation,NULL,0,11006,0
+39,8,111,Animal Welfare,NULL,0,11001,0
+40,8,111,Human Rights,NULL,0,11004,0

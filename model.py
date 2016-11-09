@@ -55,9 +55,12 @@ class Activity(db.Model):
     cat_id = db.Column(db.Integer,
                        db.ForeignKey('categories.cat_id'),
                        nullable=False)
+    eb_cat_id = db.Column(db.Integer, nullable=False)
     name = db.Column(db.String(80), nullable=False)
     act_type = db.Column(db.String(80), nullable=True)
+    eb_format_id = db.Column(db.Integer, nullable=False)
     sub_cat = db.Column(db.String(80), nullable=True)
+    mu_id = db.Column(db.Integer, nullable=False)
     
     category = db.relationship('Category', backref='activities')
 
