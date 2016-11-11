@@ -7,6 +7,7 @@ eventbrite==3.3.3
 Flask==0.11.1
 Flask-DebugToolbar==0.10.0
 Flask-SQLAlchemy==2.1
+geolocation-python==0.2.2
 idna==2.1
 ipaddress==1.0.17
 itsdangerous==0.24

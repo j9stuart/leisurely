@@ -9,7 +9,8 @@
     <p id="mood">What are you in the mood for?</p>
   </div>
     <br>
-    <form onsubmit="getLocation()" action="" id="cat-form" class="btn-group btn-group-justified">
+  </div>
+    <form id="cat-form" class="btn-group btn-group-justified">
       <div class="btn-group btn-group-justified" id="categories" role="group">
         <div class="btn-group" role="group">
           <button type="button" class="btn btn-default" name="category" id="c1" value="{{ c1 }}">{{ c1 }}</button>
@@ -27,16 +28,20 @@
           <button type="button" class="btn btn-default" name="category" id="c5" value="{{ c5 }}">{{ c5 }}</button>
         </div>
       </div>
+        <input id="location" type="hidden" value="" name="location"></input>
+        <input id="act_id" type="hidden" value="" name="act_id"></input>
     </form>
  
  {% endblock %}
 
  {% block js %}
-  <script>
-    $(":button").on('click', function (evt) {  
+
+<script>
+
+    $(".btn").on('click', function (evt) {  
       evt.preventDefault();
-      $(":button").unbind('click');
-      var category = $(this).val()
+      $(".btn").unbind('click');
+      var category = $(this).val();
       console.log("submitted");
       var url ="/activities.json?category=" + category;
       $.get(url, function (data) {
@@ -55,36 +60,16 @@
       });
     });
 
-    function getLocation() {
-      if (navigator.geolocation) {
-          navigator.geolocation.getCurrentPosition(showPosition);
-    } else { 
-          $("#geo-alert").html("Geolocation is not supported by this browser.");
-        }
-    }
-
-    function showPosition(position) {
-        $("#geo-alert").html("Latitude: " + position.coords.latitude + 
-        "<br>Longitude: " + position.coords.longitude);
-    }
-
-    function showError(error) {
-    switch(error.code) {
-        case error.PERMISSION_DENIED:
-            var zipcode = prompt("Please enter a zipcode to narrow down your results", 94122)
-            break;
-        case error.POSITION_UNAVAILABLE:
-            $("#geo-alert").html("Location information is unavailable.")
-            break;
-        case error.TIMEOUT:
-            $("#geo-alert").html("The request to get user location timed out.")
-            break;
-        case error.UNKNOWN_ERROR:
-            $("#geo-alert").html("An unknown error occurred.")
-            break;
-    }
-}
+        $("#cat-form").on('submit', function (evt) {
+          evt.preventDefault();
+          $("#cat-form").unbind('submit');
+          var act_id = $(this).find("button[type=submit]:focus").val();
+          console.log(act_id)
+          var location = prompt("Please enter an address, city name, or zipcode to narrow down your results");
+          console.log(location)
+          $("#act_id").attr('value', act_id);
+          $("#location").attr('value', location);
+          $("#cat-form").trigger("submit");
+          });
 </script>
 {% endblock %}
-
-

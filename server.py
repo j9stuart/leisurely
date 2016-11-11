@@ -12,16 +12,20 @@ import datetime
 import random
 from model import connect_to_db, db, Category, Weekday, WeekdayCategory, Activity
 import meetup.api
+from geolocation.main import GoogleMaps
+from geolocation.distance_matrix.client import DistanceMatrixApiClient
 
 auth_token = environ['EVENTBRITE_OAUTH_TOKEN']
 pusher_app_id = environ['PUSHER_APP_ID']
 pusher_key = environ['PUSHER_KEY']
 pusher_secret = environ['PUSHER_SECRET']
 mu_token = environ['MEETUP_API_KEY']
+geo_code = environ['GEOCODE_API_KEY']
 
 # Instantiate the Eventbrite and Meetup API clients.
 eventbrite = eventbrite.Eventbrite(auth_token)
 meetup = meetup.api.Client(mu_token)
+google_maps = GoogleMaps(api_key=geo_code)
 
 #Instantiate the pusher object. The pusher library pushes actions to the browser
 # when they occur. 
@@ -56,7 +60,76 @@ def index():
                             c3=c3, c4=c4, c5=c5, 
                             weekday=weekday)
 
+# ------------------------------------------------------------- #
 
+@app.route('/sign-in')
+def sign_in():
+
+    return render_template("sign_in.html")
+
+# ------------------------------------------------------------- #
+
+@app.route('/submit-signin', methods=['POST'])
+def submit_form():
+    """Submits sign-in information"""
+
+    email = request.form.get('email')
+    password = request.form.get('password')
+    user_info = db.session.query(User).filter_by(email=email).all()
+    user = user_info[0]
+
+    
+    if user_info == []:
+        flash("No account associated with this email address. Create an account below.")
+        return redirect('/sign-up')
+    if user.password == password:
+        user_id = user.user_id
+        session["user_id"] = user_id
+        flash('You were successfully logged in')
+        return redirect("/user-profile" + str(user_id))
+    else:
+        flash('Invalid credentials')
+        return redirect('/sign-in')
+
+
+# ------------------------------------------------------------- #
+
+@app.route('/sign-up')
+def create_user():
+    """Render a form for user to create account"""
+
+    return render_template("sign_up.html")
+
+
+# ------------------------------------------------------------- #
+
+
+@app.route('/submit-account', methods=["POST"])
+def submit_account():
+    """Get email and password, sign-in (if exist), or create new user"""
+
+    email = request.form.get("email")
+    password = request.form.get("password")
+
+    user = User.query.filter_by(email=email).all()
+
+    if not user:
+        new_user = User(email=email, password=password)
+        db.session.add(new_user)
+        db.session.commit()
+
+    return redirect("/")
+
+
+# ------------------------------------------------------------- #
+
+@app.route('/user-profile')
+def show_userprofile():
+
+    return render_template("user_profile.html")
+
+
+# ------------------------------------------------------------- #
 
 @app.route("/activities.json")
 def show_activities():
@@ -72,28 +145,29 @@ def show_activities():
 
     return jsonify(activity_list)
 
-
+# ------------------------------------------------------------- #
 
 @app.route('/event-list')
 def show_event_list():
     """This displays a list of events"""
     # Get data from browser
-    act_id = request.args.get('category')
+    location = request.args.get('location')
+    act_id = request.args.get('act_id')
+    locate = google_maps.search(location=location)
+    locate = locate.all()
+    user_location = locate[0]
+    lat = user_location.lat
+    lng = user_location.lng
+
     activity = Activity.query.filter_by(act_id=act_id).one()
     eb_cat_id = activity.eb_cat_id
     eb_format_id = activity.eb_format_id
     eb_sub_id = activity.sub_cat
     mu_id = activity.mu_id
-    event_details = []
-
-    print act_id
-    print eb_cat_id
-    print eb_format_id
-    print eb_sub_id 
-    print mu_id   
+    event_details = [] 
 
     if mu_id != 0:
-        events = meetup.GetOpenEvents(category=mu_id, zip=94122)
+        events = meetup.GetOpenEvents(category=mu_id, lat=lat, lon=lng)
         for event in events.results:
             event_name = event.get("name")
             event_url = event.get("event_url")
@@ -105,9 +179,11 @@ def show_event_list():
 
     else:
         if eb_sub_id != str(0):
-            events = eventbrite.get("/events/search/?categories="+str(eb_cat_id)+"&subcategories="+eb_sub_id)
+            events = eventbrite.get("/events/search/?categories="+str(eb_cat_id)+"&subcategories="+eb_sub_id+
+                                    "&location.latitude="+lat+"&location.longitude="+lng)
         else:
-            events = eventbrite.get("/events/search/?categories="+str(eb_cat_id)+"&formats="+str(eb_format_id))
+            events = eventbrite.get("/events/search/?categories="+str(eb_cat_id)+"&formats="+str(eb_format_id)+
+                                    "&location.latitude="+lat+"&location.longitude="+lng)
 
         print pprint(events)
 
@@ -128,7 +204,7 @@ def show_event_list():
                                 event_details=event_details)
 
 
-
+# ------------------------------------------------------------- #
 
 if __name__ == "__main__":
     app.debug = True
