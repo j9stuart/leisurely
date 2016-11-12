@@ -12,21 +12,11 @@
   </div>
     <form id="cat-form" class="btn-group btn-group-justified">
       <div class="btn-group btn-group-justified" id="categories" role="group">
+        {% for category in category_list %}
         <div class="btn-group" role="group">
-          <button type="button" class="btn btn-default" name="category" id="c1" value="{{ c1 }}">{{ c1 }}</button>
+          <button type="button" class="btn btn-default" id="{{ category }}" name="category" value="{{ category }}">{{ category }}</button>
         </div>
-        <div class="btn-group" role="group">
-          <button type="button" class="btn btn-default" name="category" id="c2" value="{{ c2 }}">{{ c2 }}</button>
-        </div>
-        <div class="btn-group" role="group">
-          <button type="button" class="btn btn-default" name="category" id="c3" value="{{ c3 }}">{{ c3 }}</button>
-        </div>
-        <div class="btn-group" role="group">
-          <button type="button" class="btn btn-default" name="category" id="c4" value="{{ c4 }}">{{ c4 }}</button>
-        </div>
-        <div class="btn-group" role="group">
-          <button type="button" class="btn btn-default" name="category" id="c5" value="{{ c5 }}">{{ c5 }}</button>
-        </div>
+        {% endfor %}
       </div>
         <input id="location" type="hidden" value="" name="location"></input>
         <input id="act_id" type="hidden" value="" name="act_id"></input>
@@ -45,16 +35,18 @@
       console.log("submitted");
       var url ="/activities.json?category=" + category;
       $.get(url, function (data) {
-        var [a1, a2, a3, a4, a5] = (Object.keys(data));
-        var [c1, c2, c3, c4, c5] = (Object.values(data));
-        console.log(c1, c2, c3, c4, c5);
+        var activities = (Object.keys(data));
+        var act_ids = (Object.values(data));
+        console.log(activities)
+        console.log(act_ids)
         $("p#detail").replaceWith("Great! So you feel like " + category);
         $("p#mood").replaceWith("<br>What are you interested in?");
-        $("#c1").html(a1).attr('value', c1);
-        $("#c2").html(a2).attr('value', c2);
-        $("#c3").html(a3).attr('value', c3);
-        $("#c4").html(a4).attr('value', c4);
-        $("#c5").html(a5).attr('value', c5);
+        var categories = $(".btn");
+        for (var i=0; i < categories.length; i++)
+        {
+          categories[i].id=categories[i].id.replace(/\s+/g, '');
+          $("#"+categories[i].id).html(activities[i]).attr('value', act_ids[i]);
+        }
         $("#cat-form").attr('action', "/event-list");
         $(":button").attr('type', "submit");
       });

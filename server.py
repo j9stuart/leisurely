@@ -51,13 +51,12 @@ def index():
         category_list.append(category_name)
 
     # Generate a random list of 5 categories to dispaly from dictionary
-    c1, c2, c3, c4, c5 = random.sample(category_list, 5) 
+    category_list = random.sample(category_list, 5) 
     weekday = weekday.name
 
 
     return render_template("homepage.html", 
-                            c1=c1, c2=c2,
-                            c3=c3, c4=c4, c5=c5, 
+                            category_list=category_list, 
                             weekday=weekday)
 
 # ------------------------------------------------------------- #
@@ -150,7 +149,7 @@ def show_activities():
 @app.route('/event-list')
 def show_event_list():
     """This displays a list of events"""
-    # Get data from browser
+    # Get data from browser to find user location and activity information
     location = request.args.get('location')
     act_id = request.args.get('act_id')
     locate = google_maps.search(location=location)
@@ -166,6 +165,9 @@ def show_event_list():
     mu_id = activity.mu_id
     event_details = [] 
 
+    # Get datetime to use in api query
+    now = datetime.datetime.now()
+
     if mu_id != 0:
         events = meetup.GetOpenEvents(category=mu_id, lat=lat, lon=lng)
         for event in events.results:
@@ -179,15 +181,11 @@ def show_event_list():
 
     else:
         if eb_sub_id != str(0):
-            events = eventbrite.get("/events/search/?categories="+str(eb_cat_id)+"&subcategories="+eb_sub_id+
-                                    "&location.latitude="+lat+"&location.longitude="+lng)
+            events = eventbrite.get("/events/search/?categories="+str(eb_cat_id)+"&subcategories="+eb_sub_id+"&location.latitude="+str(lat)+"&location.longitude="+str(lng))
         else:
-            events = eventbrite.get("/events/search/?categories="+str(eb_cat_id)+"&formats="+str(eb_format_id)+
-                                    "&location.latitude="+lat+"&location.longitude="+lng)
+            events = eventbrite.get("/events/search/?categories="+str(eb_cat_id)+"&formats="+str(eb_format_id)+"&location.latitude="+str(lat)+"&location.longitude="+str(lng))
 
-        print pprint(events)
-
-        if events.get("events") == []:
+        if events.get("events") == [] or events == None:
             flash('Sorry there are no events at this time!')
             return redirect("/")
 
