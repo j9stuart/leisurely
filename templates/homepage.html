@@ -56,9 +56,7 @@
           evt.preventDefault();
           $("#cat-form").unbind('submit');
           var act_id = $(this).find("button[type=submit]:focus").val();
-          console.log(act_id)
           var location = prompt("Please enter an address, city name, or zipcode to narrow down your results");
-          console.log(location)
           $("#act_id").attr('value', act_id);
           $("#location").attr('value', location);
           $("#cat-form").trigger("submit");

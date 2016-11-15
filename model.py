@@ -70,6 +70,17 @@ class Activity(db.Model):
 
         return "<Activity: {}>".format(self.name)
 
+class User(db.Model):
+    """List of users who have created accounts"""
+
+    __tablename__ = "users"
+
+    user_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    email = db.Column(db.String(80), nullable=False)
+    password = db.Column(db.String(80), nullable=False)
+    
+    
+
 ###############################################################################
 
 def connect_to_db(app):

@@ -10,10 +10,12 @@ import requests
 from jinja2 import StrictUndefined
 import datetime
 import random
-from model import connect_to_db, db, Category, Weekday, WeekdayCategory, Activity
+from model import connect_to_db, db, Category, Weekday, WeekdayCategory, Activity, User
 import meetup.api
 from geolocation.main import GoogleMaps
 from geolocation.distance_matrix.client import DistanceMatrixApiClient
+from bcrypt import hashpw, gensalt
+import geocoder
 
 auth_token = environ['EVENTBRITE_OAUTH_TOKEN']
 pusher_app_id = environ['PUSHER_APP_ID']
@@ -35,7 +37,6 @@ app = Flask(__name__)
 app.debug = True
 app.jinja_env.undefined = StrictUndefined
 app.secret_key = "leisure"
-
 
 @app.route('/')
 def index():
@@ -73,23 +74,39 @@ def submit_form():
     """Submits sign-in information"""
 
     email = request.form.get('email')
-    password = request.form.get('password')
-    user_info = db.session.query(User).filter_by(email=email).all()
-    user = user_info[0]
-
-    
-    if user_info == []:
-        flash("No account associated with this email address. Create an account below.")
+    password = request.form.get('password').encode('utf-8')
+    user_obj = User.query.filter_by(email=email).all()
+    user = user_obj[0]
+    user_password = user.password.encode('utf-8')
+        
+    if user == []:
+        flash("No account associated with this email address. Please create an account below.")
         return redirect('/sign-up')
-    if user.password == password:
+    if user_password == hashpw(password, user_password):
         user_id = user.user_id
         session["user_id"] = user_id
         flash('You were successfully logged in')
-        return redirect("/user-profile" + str(user_id))
+        return redirect("/user-profile")
     else:
         flash('Invalid credentials')
         return redirect('/sign-in')
 
+# ------------------------------------------------------------- #
+
+@app.route('/user-profile')
+def show_user_info():
+    """Show user-specific information"""
+    if session == {}:
+        return redirect("/")
+    else:
+        user = session['user_id']
+        user = User.query.filter_by(user=user_id).all()
+        user = user[0]
+        email = user.email
+
+
+    return render_template("user_profile.html", 
+                            email=email)
 
 # ------------------------------------------------------------- #
 
@@ -103,30 +120,37 @@ def create_user():
 # ------------------------------------------------------------- #
 
 
-@app.route('/submit-account', methods=["POST"])
+@app.route('/submit-signup', methods=["POST"])
 def submit_account():
     """Get email and password, sign-in (if exist), or create new user"""
 
     email = request.form.get("email")
     password = request.form.get("password")
-
     user = User.query.filter_by(email=email).all()
 
     if not user:
+        password = password.encode('utf-8')
+        password = hashpw(password, gensalt())
+        print password
         new_user = User(email=email, password=password)
         db.session.add(new_user)
         db.session.commit()
+        flash("Congratulations! You successfully created an account!")
+    else:
+        flash("An account with this email address already exists!")
 
     return redirect("/")
 
 
 # ------------------------------------------------------------- #
 
-@app.route('/user-profile')
-def show_userprofile():
+@app.route('/sign-out')
+def log_out():
+    """Logs user out"""
 
-    return render_template("user_profile.html")
-
+    del session["user_id"]
+    flash('You were successfully logged out')
+    return redirect("/")
 
 # ------------------------------------------------------------- #
 
@@ -152,12 +176,9 @@ def show_event_list():
     # Get data from browser to find user location and activity information
     location = request.args.get('location')
     act_id = request.args.get('act_id')
-    locate = google_maps.search(location=location)
-    locate = locate.all()
-    user_location = locate[0]
-    lat = user_location.lat
-    lng = user_location.lng
-
+    locate = geocoder.google(location)
+    lat, lng = locate.latlng
+    
     activity = Activity.query.filter_by(act_id=act_id).one()
     eb_cat_id = activity.eb_cat_id
     eb_format_id = activity.eb_format_id
@@ -167,13 +188,19 @@ def show_event_list():
 
     # Get datetime to use in api query
     now = datetime.datetime.now()
+    endtime = now.strftime("%Y-%m-%d 23:59:59")
+
+    if location is None or locate == []:
+        flash("The location you entered could not be found. Please try your search again.")
+        return redirect("")
 
     if mu_id != 0:
         events = meetup.GetOpenEvents(category=mu_id, lat=lat, lon=lng)
         for event in events.results:
             event_name = event.get("name")
             event_url = event.get("event_url")
-            event_deets = (event_name, event_url)
+            event_photo = event.get("photo_url")
+            event_deets = [event_name, event_url, event_photo]
             event_details.append(event_deets)
 
         return render_template("meetup_events.html",
@@ -185,7 +212,7 @@ def show_event_list():
         else:
             events = eventbrite.get("/events/search/?categories="+str(eb_cat_id)+"&formats="+str(eb_format_id)+"&location.latitude="+str(lat)+"&location.longitude="+str(lng))
 
-        if events.get("events") == [] or events == None:
+        if events.get("events") == [] or events.get("events") is None:
             flash('Sorry there are no events at this time!')
             return redirect("/")
 
