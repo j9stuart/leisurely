@@ -27,10 +27,17 @@
  {% block js %}
 
 <script>
+    
+    window.onpageshow = function (event) {
+      if (event.persisted) {
+        window.location.reload()
+      }
+    }; 
 
     $(".btn").on('click', function (evt) {  
       evt.preventDefault();
       $(".btn").unbind('click');
+      $(this).blur();
       var category = $(this).val();
       console.log("submitted");
       var url ="/activities.json?category=" + category;
@@ -51,15 +58,20 @@
         $(":button").attr('type', "submit");
       });
     });
-
-        $("#cat-form").on('submit', function (evt) {
+        
+          var getEvent = function (evt) {
           evt.preventDefault();
           $("#cat-form").unbind('submit');
-          var act_id = $(this).find("button[type=submit]:focus").val();
+          var choice = $(this).find("button[type=submit]:focus")
+          choice.blur()
+          var act_id = choice.val();
           var location = prompt("Please enter an address, city name, or zipcode to narrow down your results");
           $("#act_id").attr('value', act_id);
           $("#location").attr('value', location);
           $("#cat-form").trigger("submit");
-          });
+          };
+        
+          $("#cat-form").on('submit', getEvent);
+
 </script>
 {% endblock %}

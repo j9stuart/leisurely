@@ -16,6 +16,7 @@ from geolocation.main import GoogleMaps
 from geolocation.distance_matrix.client import DistanceMatrixApiClient
 from bcrypt import hashpw, gensalt
 import geocoder
+import re
 
 auth_token = environ['EVENTBRITE_OAUTH_TOKEN']
 pusher_app_id = environ['PUSHER_APP_ID']
@@ -28,6 +29,7 @@ geo_code = environ['GEOCODE_API_KEY']
 eventbrite = eventbrite.Eventbrite(auth_token)
 meetup = meetup.api.Client(mu_token)
 google_maps = GoogleMaps(api_key=geo_code)
+geo_api = geo_code
 
 #Instantiate the pusher object. The pusher library pushes actions to the browser
 # when they occur. 
@@ -37,6 +39,33 @@ app = Flask(__name__)
 app.debug = True
 app.jinja_env.undefined = StrictUndefined
 app.secret_key = "leisure"
+
+# --------------------------- FUNCTIONS --------------------------------- #
+
+def is_email_address_valid(email):
+    """Validate the email address using a regex.
+
+    
+
+
+    """
+    if not re.match("^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$", email):
+        return False
+    return True
+
+
+def check_password(password):
+    """Validate the password by checking length"""
+    if 6 <= len(password) < 12:
+        return True
+        
+    else:
+        flash('Your password must be between 6 and 12 characters. Please try again.')
+        return False
+
+
+# ----------------------------- ROUTES ---------------------------------- #
+
 
 @app.route('/')
 def index():
@@ -58,7 +87,7 @@ def index():
 
     return render_template("homepage.html", 
                             category_list=category_list, 
-                            weekday=weekday)
+                            weekday=weekday, geo_api=geo_api)
 
 # ------------------------------------------------------------- #
 
@@ -75,13 +104,19 @@ def submit_form():
 
     email = request.form.get('email')
     password = request.form.get('password').encode('utf-8')
+    if not is_email_address_valid(email):
+        flash("Please enter a valid email address")
+        return redirect("/sign-in")
+
     user_obj = User.query.filter_by(email=email).all()
-    user = user_obj[0]
-    user_password = user.password.encode('utf-8')
-        
-    if user == []:
+
+    if user_obj == []:
         flash("No account associated with this email address. Please create an account below.")
         return redirect('/sign-up')
+
+    user = user_obj[0]
+    user_password = user.password.encode('utf-8')
+
     if user_password == hashpw(password, user_password):
         user_id = user.user_id
         session["user_id"] = user_id
@@ -128,18 +163,23 @@ def submit_account():
     password = request.form.get("password")
     user = User.query.filter_by(email=email).all()
 
-    if not user:
-        password = password.encode('utf-8')
-        password = hashpw(password, gensalt())
-        print password
-        new_user = User(email=email, password=password)
-        db.session.add(new_user)
-        db.session.commit()
-        flash("Congratulations! You successfully created an account!")
+    if not is_email_address_valid(email):
+        flash("Please enter a valid email address")
+        return redirect("/sign-up")       
+    if check_password(password):
+        if not user:
+            password = password.encode('utf-8')
+            password = hashpw(password, gensalt())
+            print password
+            new_user = User(email=email, password=password)
+            db.session.add(new_user)
+            db.session.commit()
+            flash("Congratulations! You successfully created an account!")
+        else:
+            flash("An account with this email address already exists!")
+        return redirect("/")
     else:
-        flash("An account with this email address already exists!")
-
-    return redirect("/")
+        return redirect("/sign-up")    
 
 
 # ------------------------------------------------------------- #
@@ -177,6 +217,10 @@ def show_event_list():
     location = request.args.get('location')
     act_id = request.args.get('act_id')
     locate = geocoder.google(location)
+    city = locate.city
+    if location is "" or locate.city is None:
+        flash("The location you entered could not be found. Please try your search again.")
+        return redirect("")
     lat, lng = locate.latlng
     
     activity = Activity.query.filter_by(act_id=act_id).one()
@@ -190,17 +234,13 @@ def show_event_list():
     now = datetime.datetime.now()
     endtime = now.strftime("%Y-%m-%d 23:59:59")
 
-    if location is None or locate == []:
-        flash("The location you entered could not be found. Please try your search again.")
-        return redirect("")
 
     if mu_id != 0:
         events = meetup.GetOpenEvents(category=mu_id, lat=lat, lon=lng)
         for event in events.results:
             event_name = event.get("name")
             event_url = event.get("event_url")
-            event_photo = event.get("photo_url")
-            event_deets = [event_name, event_url, event_photo]
+            event_deets = [event_name, event_url]
             event_details.append(event_deets)
 
         return render_template("meetup_events.html",
