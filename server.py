@@ -219,7 +219,7 @@ def show_event_list():
     city = locate.city
     if location is "" or locate.city is None:
         flash("The location you entered could not be found. Please try your search again.")
-        return redirect("")
+        return redirect("/")
     lat, lng = locate.latlng
     
     activity = Activity.query.filter_by(act_id=act_id).one()
@@ -237,23 +237,27 @@ def show_event_list():
 
     if mu_id != 0:
         events = meetup.GetOpenEvents(category=mu_id, lat=lat, lon=lng, fields="group_photo")
-        for event in events.results:
-            event_name = event.get("name")
-            event_url = event.get("event_url")
-            event_pic = event.get("group")
+        if events.results is None:
+            flash('Sorry there are no events for your search at this time!')
+            return redirect("/")
+        else:
+            for event in events.results:
+                event_name = event.get("name")
+                event_url = event.get("event_url")
+                event_pic = event.get("group")
 
-            if event_pic is None:
-                event_deets = [event_name, event_url, meetup_default_url] 
-                event_details.append(event_deets)      
-            else:
-                event_pic = event_pic.get("group_photo")
-                if event_pic is not None:
-                    event_pic = event_pic.get("photo_link")
-                    event_deets = [event_name, event_url, event_pic]
-                    event_details.append(event_deets)
+                if event_pic is None:
+                    event_deets = [event_name, event_url, meetup_default_url] 
+                    event_details.append(event_deets)      
                 else:
-                    event_deets = [event_name, event_url, meetup_default_url]
-                    event_details.append(event_deets)
+                    event_pic = event_pic.get("group_photo")
+                    if event_pic is not None:
+                        event_pic = event_pic.get("photo_link")
+                        event_deets = [event_name, event_url, event_pic]
+                        event_details.append(event_deets)
+                    else:
+                        event_deets = [event_name, event_url, meetup_default_url]
+                        event_details.append(event_deets)
 
         return render_template("meetup_events.html",
                                 event_details=event_details)
