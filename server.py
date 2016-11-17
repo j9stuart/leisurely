@@ -170,7 +170,6 @@ def submit_account():
         if not user:
             password = password.encode('utf-8')
             password = hashpw(password, gensalt())
-            print password
             new_user = User(email=email, password=password)
             db.session.add(new_user)
             db.session.commit()
@@ -233,24 +232,37 @@ def show_event_list():
     # Get datetime to use in api query
     now = datetime.datetime.now()
     endtime = now.strftime("%Y-%m-%d 23:59:59")
-
+    meetup_default_url = "https://upload.wikimedia.org/wikipedia/commons/8/80/Meetup_square.png"
+    eventbrite_default_url = "https://upload.wikimedia.org/wikipedia/commons/8/87/Eventbrite_wordmark_orange.jpg"
 
     if mu_id != 0:
-        events = meetup.GetOpenEvents(category=mu_id, lat=lat, lon=lng)
+        events = meetup.GetOpenEvents(category=mu_id, lat=lat, lon=lng, fields="group_photo")
         for event in events.results:
             event_name = event.get("name")
             event_url = event.get("event_url")
-            event_deets = [event_name, event_url]
-            event_details.append(event_deets)
+            event_pic = event.get("group")
+
+            if event_pic is None:
+                event_deets = [event_name, event_url, meetup_default_url] 
+                event_details.append(event_deets)      
+            else:
+                event_pic = event_pic.get("group_photo")
+                if event_pic is not None:
+                    event_pic = event_pic.get("photo_link")
+                    event_deets = [event_name, event_url, event_pic]
+                    event_details.append(event_deets)
+                else:
+                    event_deets = [event_name, event_url, meetup_default_url]
+                    event_details.append(event_deets)
 
         return render_template("meetup_events.html",
                                 event_details=event_details)
 
     else:
         if eb_sub_id != str(0):
-            events = eventbrite.get("/events/search/?categories="+str(eb_cat_id)+"&subcategories="+eb_sub_id+"&location.latitude="+str(lat)+"&location.longitude="+str(lng))
+            events = eventbrite.get("/events/search/?categories="+str(eb_cat_id)+"&subcategories="+eb_sub_id+"&location.address="+str(city))
         else:
-            events = eventbrite.get("/events/search/?categories="+str(eb_cat_id)+"&formats="+str(eb_format_id)+"&location.latitude="+str(lat)+"&location.longitude="+str(lng))
+            events = eventbrite.get("/events/search/?categories="+str(eb_cat_id)+"&formats="+str(eb_format_id)+"&location.address="+str(city))
 
         if events.get("events") == [] or events.get("events") is None:
             flash('Sorry there are no events at this time!')
@@ -259,11 +271,17 @@ def show_event_list():
         else:
             event_list = events.get("events")
             for event in event_list:
-                event_name_dict = event.get("name")
-                event_name = event_name_dict.get("text")
+                event_name = event.get("name").get("text")
                 event_url = event.get("url")
-                event_deets = (event_name, event_url)
-                event_details.append(event_deets)
+                event_img = event.get("logo")
+                
+                if event_img is None:
+                    event_deets = [event_name, event_url, eventbrite_default_url]
+                    event_details.append(event_deets)
+                else:
+                    event_img = event_img.get("original").get("url")
+                    event_deets = [event_name, event_url, event_img]
+                    event_details.append(event_deets)
     
             return render_template("eventbevents.html",
                                 event_details=event_details)

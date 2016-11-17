@@ -31,6 +31,21 @@ google_maps = GoogleMaps(api_key=geo_code)
 # when they occur. 
 p = pusher.Pusher(app_id=pusher_app_id, key=pusher_key, secret=pusher_secret)
 
+event_list = events.get("events")
+    for event in event_list:
+        event_name_dict = event.get("name")
+        event_name = event_name_dict.get("text")
+        event_url = event.get("url")
+        event_start_dict = event.get("start")
+        event_deets = (event_name, event_url)
+
+
+
+
+
+
+
+
 app = Flask(__name__)
 app.debug = True
 app.jinja_env.undefined = StrictUndefined
