@@ -8,8 +8,9 @@
       <title>Leisurely</title>
 
       <!-- Bootstrap -->
-      <link href="//maxcdn.bootstrapcdn.com/bootswatch/3.3.4/cyborg/bootstrap.min.css"
-            rel="stylesheet">
+      <link href="//maxcdn.bootstrapcdn.com/bootswatch/3.3.4/united/bootstrap.min.css"
+            rel="stylesheet" type="text/css" href="style.css">
+ 
   </head>
   <body>
     <nav class="navbar navbar-default">
@@ -30,9 +31,11 @@
           <ul class="nav navbar-nav">
             <li>{% if "user_id" in session %}<a href="/sign-out">Sign out<span class="sr-only"></span></a></li>{% else %}<a href="/sign-in">Sign in<span class="sr-only"></span></a></li>
             <li><a href="/sign-up">Sign up</a></li>{% endif %}
-          </ul>{% if "user_id" in session %}
+          </ul>
+          {% if "user_id" in session %}
           <ul class="nav navbar-nav navbar-right">
-            <li><a href="/user-profile">Account</a></li>{% endif %}
+            <li><a href="/user-profile">Account</a></li>
+          {% endif %}
           </ul>
         </div><!-- /.navbar-collapse -->
       </div><!-- /.container-fluid -->

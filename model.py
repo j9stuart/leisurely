@@ -78,8 +78,20 @@ class User(db.Model):
     user_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     email = db.Column(db.String(80), nullable=False)
     password = db.Column(db.String(80), nullable=False)
-    
-    
+
+class SavedEvent(db.Model):
+    """List of saved events to be mapped to users"""
+
+    __tablename__ = "saved_events"
+
+    saved_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'))
+    event_id = db.Column(db.BigInteger, nullable=False)
+    event_name = db.Column(db.String(200), nullable=False)
+    event_url = db.Column(db.String(200), nullable=False)
+
+    user = db.relationship('User', backref=db.backref('saved_events', order_by=saved_id))
+
 
 ###############################################################################
 

@@ -10,7 +10,7 @@ import requests
 from jinja2 import StrictUndefined
 import datetime
 import random
-from model import connect_to_db, db, Category, Weekday, WeekdayCategory, Activity, User
+from model import connect_to_db, db, Category, Weekday, WeekdayCategory, Activity, User, SavedEvent
 import meetup.api
 from geolocation.main import GoogleMaps
 from geolocation.distance_matrix.client import DistanceMatrixApiClient
@@ -135,7 +135,7 @@ def show_user_info():
         return redirect("/")
     else:
         user = session['user_id']
-        user = User.query.filter_by(user=user_id).all()
+        user = User.query.filter_by(user_id=user).all()
         user = user[0]
         email = user.email
 
@@ -245,18 +245,19 @@ def show_event_list():
                 event_name = event.get("name")
                 event_url = event.get("event_url")
                 event_pic = event.get("group")
+                event_id = event.get("id")
 
                 if event_pic is None:
-                    event_deets = [event_name, event_url, meetup_default_url] 
+                    event_deets = [event_name, event_url, meetup_default_url, event_id] 
                     event_details.append(event_deets)      
                 else:
                     event_pic = event_pic.get("group_photo")
                     if event_pic is not None:
                         event_pic = event_pic.get("photo_link")
-                        event_deets = [event_name, event_url, event_pic]
+                        event_deets = [event_name, event_url, event_pic, event_id]
                         event_details.append(event_deets)
                     else:
-                        event_deets = [event_name, event_url, meetup_default_url]
+                        event_deets = [event_name, event_url, meetup_default_url, event_id]
                         event_details.append(event_deets)
 
         return render_template("meetup_events.html",
@@ -278,13 +279,14 @@ def show_event_list():
                 event_name = event.get("name").get("text")
                 event_url = event.get("url")
                 event_img = event.get("logo")
+                event_id = event.get("id")
                 
                 if event_img is None:
-                    event_deets = [event_name, event_url, eventbrite_default_url]
+                    event_deets = [event_name, event_url, eventbrite_default_url, event_id]
                     event_details.append(event_deets)
                 else:
                     event_img = event_img.get("original").get("url")
-                    event_deets = [event_name, event_url, event_img]
+                    event_deets = [event_name, event_url, event_img, event_id]
                     event_details.append(event_deets)
     
             return render_template("eventbevents.html",
@@ -292,6 +294,38 @@ def show_event_list():
 
 
 # ------------------------------------------------------------- #
+
+@app.route("/save_event.json", methods=["POST"])
+def save_event():
+    """Saves an event to a saved events page for users"""
+
+    event_id = int(request.form.get("event_id"))
+    event_name = request.form.get("event_name")
+    event_url = request.form.get("event_url")
+    user_id = int(session["user_id"])
+
+    old_saved_event = SavedEvent.query.filter(SavedEvent.event_id == event_id, SavedEvent.user_id == user_id).all()
+
+    print old_saved_event
+
+    if old_saved_event: 
+        db.session.delete(old_saved_event[0])
+        db.session.commit()
+        result_code = 'Delete'
+        print "deleted" 
+
+    else:
+        new_saved_event = SavedEvent(user_id=user_id, event_id=event_id, event_name=event_name, event_url=event_url)
+        db.session.add(new_saved_event)
+        db.session.commit()
+        result_code = 'Add'
+        print "added"
+    
+    return jsonify({'code': result_code})
+
+
+# ------------------------------------------------------------- #
+
 
 if __name__ == "__main__":
     app.debug = True

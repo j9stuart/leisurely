@@ -50,7 +50,6 @@ window.onhashchange = function() {
       $(".btn").unbind('click');
       $(this).blur();
       var category = $(this).val();
-      console.log("submitted");
       var url ="/activities.json?category=" + category;
       $.get(url, function (data) {
         var activities = (Object.keys(data));
