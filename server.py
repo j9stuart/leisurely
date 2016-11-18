@@ -326,6 +326,26 @@ def save_event():
 
 # ------------------------------------------------------------- #
 
+@app.route("/saved-events")
+def show_saved_events():
+    """Shows the user events they have saved"""
+
+    user_id = session["user_id"]
+    saved_events = SavedEvent.query.filter_by(user_id=user_id).all()
+
+    return render_template("saved_events.html", saved_events=saved_events)
+
+
+
+
+
+
+
+
+
+
+# ------------------------------------------------------------- #
+
 
 if __name__ == "__main__":
     app.debug = True
