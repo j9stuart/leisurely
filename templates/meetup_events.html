@@ -8,11 +8,34 @@
           <li>
             <img src="{{ event[2] }}" alt="event_photo" style="width:200px;height:200px;"><a href="{{ event[1] }}" target="_blank">{{ event[0] }}</a>
           </li>
+        {% if "user_id" in session %}
+            <button class="save-btn" id="{{ event[3] }}" name="{{ event[0] }}" value="{{ event[1] }}"><span class="glyphicon glyphicon-bookmark"></span>Save Event</button>
+          {% endif %}
         {% endfor %}
       </ul> 
   </div>
 
  
+{% endblock %}
+
+{% block js %}
+<script>
+  function saveEvent (evt) {
+    evt.preventDefault();
+
+    $.post('/save_event.json', {'event_id': this.id, 'event_name': this.name, 'event_url': this.value}, function (results) {
+      if (results.code == "Delete") {
+        console.log("You deleted this from the database");
+      }
+      else {
+        console.log("You added this to your favorites");
+      }
+    });
+};
+
+$(".save-btn").on('click', saveEvent);
+
+</script>
 {% endblock %}
 
  

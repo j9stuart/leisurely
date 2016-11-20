@@ -3,14 +3,21 @@
 {% block content %}
 
     <!-- Category Buttons -->
-  <div id="mood-message">
-    <p id="geo-alert"></p>
-    <p id="detail" name="cat_id">Today is {{ weekday }}</p>
-    <p id="mood">What are you in the mood for?</p>
-  </div>
-    <br>
-  </div>
-    <form id="cat-form" class="btn-group btn-group-justified">
+  <div class="container">
+    <form id="cat-form">
+        <label for="filter">Filter by:</label>
+        <select name="filter" class="form-control">
+          <option value="0" selected>All Events</option>
+          <option value="1">Happening Today</option>
+          <option value="2">Happening this Week</option>
+          <option value="3">Happening this Month</option>
+          <option value="4">Free Events</option>
+        </select>
+        <br>
+      <label for="contain">Address:</label><br>
+        <input required name="location" id="searchTextField" class="span5" placeholder="  Location: City, State, Zip" type="text" size="50"></input>
+        <br>
+        <br>
       <div class="btn-group btn-group-justified" id="categories" role="group">
         {% for category in category_list %}
         <div class="btn-group" role="group">
@@ -18,16 +25,15 @@
         </div>
         {% endfor %}
       </div>
-        <input id="location" type="hidden" value="" name="location"></input>
         <input id="act_id" type="hidden" value="" name="act_id"></input>
     </form>
+  </div>
  
  {% endblock %}
 
  {% block js %}
 
 <script>
-
 function doclick() {
     times++;
     location.hash = times;
@@ -40,11 +46,14 @@ window.onhashchange = function() {
     }
 }
 
-    window.onpageshow = function (event) {
-      if (event.persisted) {
-        window.location.reload()
-      }
-    }; 
+// Need to research this function
+window.onpageshow = function (event) {
+  if (event.persisted) {
+    window.location.reload()
+  }
+}; 
+
+// First round of categories to switch out buttons with activities
     $(".btn").on('click', function (evt) {  
       evt.preventDefault();
       $(".btn").unbind('click');
@@ -56,8 +65,6 @@ window.onhashchange = function() {
         var act_ids = (Object.values(data));
         console.log(activities)
         console.log(act_ids)
-        $("p#detail").replaceWith("Great! So you feel like " + category);
-        $("p#mood").replaceWith("<br>What are you interested in?");
         var categories = $(".btn");
         for (var i=0; i < categories.length; i++)
         {
@@ -72,15 +79,24 @@ window.onhashchange = function() {
           var getEvent = function (evt) {
           evt.preventDefault();
           $("#cat-form").unbind('submit');
-          var choice = $(this).find("button[type=submit]:focus")
-          choice.blur()
+          var choice = $(this).find("button[type=submit]:focus");
+          choice.blur();
           var act_id = choice.val();
-          var location = prompt("Please enter an address, city name, or zipcode to narrow down your results");
           $("#act_id").attr('value', act_id);
-          $("#location").attr('value', location);
           $("#cat-form").trigger("submit");
           };
         
           $("#cat-form").on('submit', getEvent);
+
+
+// google maps API to autocomplete address
+function initialize() {
+
+  var input = document.getElementById('searchTextField');
+  var autocomplete = new google.maps.places.Autocomplete(input);
+}
+
+  google.maps.event.addDomListener(window, 'load', initialize);
+
 </script>
 {% endblock %}

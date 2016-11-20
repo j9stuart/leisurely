@@ -17,6 +17,7 @@ from geolocation.distance_matrix.client import DistanceMatrixApiClient
 from bcrypt import hashpw, gensalt
 import geocoder
 import re
+from db_funct import is_email_address_valid, check_password, query_eb_subcat, query_eb_formats, get_filter_value, query_mu
 
 auth_token = environ['EVENTBRITE_OAUTH_TOKEN']
 pusher_app_id = environ['PUSHER_APP_ID']
@@ -39,29 +40,6 @@ app = Flask(__name__)
 app.debug = True
 app.jinja_env.undefined = StrictUndefined
 app.secret_key = "leisure"
-
-# --------------------------- FUNCTIONS --------------------------------- #
-
-def is_email_address_valid(email):
-    """Validate the email address using a regex.
-
-    
-
-
-    """
-    if not re.match("^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$", email):
-        return False
-    return True
-
-
-def check_password(password):
-    """Validate the password by checking length"""
-    if 6 <= len(password) < 12:
-        return True
-        
-    else:
-        flash('Your password must be between 6 and 12 characters. Please try again.')
-        return False
 
 
 # ----------------------------- ROUTES ---------------------------------- #
@@ -215,13 +193,15 @@ def show_event_list():
     # Get data from browser to find user location and activity information
     location = request.args.get('location')
     act_id = request.args.get('act_id')
+    filter_by = request.args.get('filter')
     locate = geocoder.google(location)
     city = locate.city
     if location is "" or locate.city is None:
         flash("The location you entered could not be found. Please try your search again.")
         return redirect("/")
-    lat, lng = locate.latlng
+    lat, lon = locate.latlng
     
+
     activity = Activity.query.filter_by(act_id=act_id).one()
     eb_cat_id = activity.eb_cat_id
     eb_format_id = activity.eb_format_id
@@ -236,7 +216,8 @@ def show_event_list():
     eventbrite_default_url = "https://upload.wikimedia.org/wikipedia/commons/8/87/Eventbrite_wordmark_orange.jpg"
 
     if mu_id != 0:
-        events = meetup.GetOpenEvents(category=mu_id, lat=lat, lon=lng, fields="group_photo")
+        events = query_mu(mu_id, lat, lon, filter_by)
+        
         if events.results is None:
             flash('Sorry there are no events for your search at this time!')
             return redirect("/")
@@ -249,7 +230,8 @@ def show_event_list():
 
                 if event_pic is None:
                     event_deets = [event_name, event_url, meetup_default_url, event_id] 
-                    event_details.append(event_deets)      
+                    event_details.append(event_deets)
+
                 else:
                     event_pic = event_pic.get("group_photo")
                     if event_pic is not None:
@@ -264,10 +246,15 @@ def show_event_list():
                                 event_details=event_details)
 
     else:
+        filter_value = get_filter_value(filter_by)
+
         if eb_sub_id != str(0):
-            events = eventbrite.get("/events/search/?categories="+str(eb_cat_id)+"&subcategories="+eb_sub_id+"&location.address="+str(city))
+            events = query_eb_subcat(eb_cat_id, filter_value, eb_sub_id, location)
+
+            
         else:
-            events = eventbrite.get("/events/search/?categories="+str(eb_cat_id)+"&formats="+str(eb_format_id)+"&location.address="+str(city))
+            events = query_eb_formats(eb_cat_id, filter_value, eb_format_id, location)
+
 
         if events.get("events") == [] or events.get("events") is None:
             flash('Sorry there are no events at this time!')
@@ -334,14 +321,6 @@ def show_saved_events():
     saved_events = SavedEvent.query.filter_by(user_id=user_id).all()
 
     return render_template("saved_events.html", saved_events=saved_events)
-
-
-
-
-
-
-
-
 
 
 # ------------------------------------------------------------- #

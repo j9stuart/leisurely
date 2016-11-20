@@ -1,8 +1,9 @@
-1,Music,Jamming Out
-2,Business & Professional,Getting Ahead
-3,Food & Drink,Grubbing
-4,Performing & Visual Arts,Being Artsy
-5,Sports & Fitness,Getting Swoll
-6,Science & Technology,Nerding Out
-7,Travel & Outdoors,Being Outdoorsy
-8,Charity & Causes,Getting Involved
+cat_id,name,screenname,weekday,image_url
+1,Music,Jamming Out,everyday,https://static.pexels.com/photos/3104/black-and-white-music-headphones-life.jpg
+2,Business & Professional,Getting Ahead,Mon-Thur,https://static.pexels.com/photos/30342/pexels-photo-30342.jpg
+3,Food & Drink,Grubbing,everyday,https://static.pexels.com/photos/5317/food-salad-restaurant-person.jpg
+4,Performing & Visual Arts,Being Artsy,Fri - Sun,https://static.pexels.com/photos/38981/pexels-photo-38981.jpeg
+5,Sports & Fitness,Getting Swoll,everyday,https://static.pexels.com/photos/38630/bodybuilder-weight-training-stress-38630.jpeg
+6,Science & Technology,Being Nerdy,Mon-Thur,https://static.pexels.com/photos/4078/healthy-person-woman-sport.jpg
+7,Travel & Outdoors,Being Outdoorsy,Fri - Sun,https://static.pexels.com/photos/139573/pexels-photo-139573.jpeg
+8,Charity & Causes,Getting Involved,Fri - Sun,https://upload.wikimedia.org/wikipedia/commons/7/7e/Volunteer_Student_Athlete_%283287537531%29.jpg
