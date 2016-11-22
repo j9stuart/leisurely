@@ -27,11 +27,17 @@ pusher_secret = environ['PUSHER_SECRET']
 mu_token = environ['MEETUP_API_KEY']
 geo_code = environ['GEOCODE_API_KEY']
 
+
 # Instantiate the Eventbrite and Meetup API clients.
 eventbrite = eventbrite.Eventbrite(auth_token)
 meetup = meetup.api.Client(mu_token)
 google_maps = GoogleMaps(api_key=geo_code)
 geo_api = geo_code
+
+
+MEETUP_IMG_URL = "https://upload.wikimedia.org/wikipedia/commons/8/80/Meetup_square.png"
+EVBRTE_IMG_URL = "https://upload.wikimedia.org/wikipedia/commons/8/87/Eventbrite_wordmark_orange.jpg"
+
 
 
 def is_email_address_valid(email):
@@ -126,4 +132,8 @@ def query_mu(mu_id, lat, lon, filter_by):
 
     return events
 
-    
+
+
+
+
+                

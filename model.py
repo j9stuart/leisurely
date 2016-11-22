@@ -93,6 +93,10 @@ class SavedEvent(db.Model):
     user = db.relationship('User', backref=db.backref('saved_events', order_by=saved_id))
 
 
+
+
+
+
 ###############################################################################
 
 def connect_to_db(app):

@@ -5,6 +5,7 @@ from model import WeekdayCategory
 from model import Activity
 from datetime import datetime
 import re
+from db_funcy import seed_events
 
 from model import connect_to_db, db
 from server import app
@@ -117,6 +118,7 @@ def load_activities():
     # Commit my work
 
     db.session.commit()
+
 
 
 if __name__ == "__main__":
