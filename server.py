@@ -10,7 +10,7 @@ import requests
 from jinja2 import StrictUndefined
 import datetime
 import random
-from model import connect_to_db, db, Category, Weekday, WeekdayCategory, Activity, User, SavedEvent
+from model import connect_to_db, db, Category, Weekday, WeekdayCategory, Activity, User, SavedEvent, SearchInfo
 import meetup.api
 from geolocation.main import GoogleMaps
 from geolocation.distance_matrix.client import DistanceMatrixApiClient
@@ -56,7 +56,8 @@ def index():
     weekday = Weekday.query.get(weekday)
     for category in weekday.categories:
         category_name = category.screenname
-        category_list.append(category_name)
+        category_pic = category.img_url
+        category_list.append((category_name, category_pic))
 
     # Generate a random list of 5 categories to dispaly from dictionary
     category_list = random.sample(category_list, 5) 
@@ -201,7 +202,6 @@ def show_event_list():
         return redirect("/")
     lat, lon = locate.latlng
     
-
     activity = Activity.query.filter_by(act_id=act_id).one()
     eb_cat_id = activity.eb_cat_id
     eb_format_id = activity.eb_format_id
@@ -211,9 +211,19 @@ def show_event_list():
 
     # Get datetime to use in api query
     now = datetime.datetime.now()
-    endtime = now.strftime("%Y-%m-%d 23:59:59")
-    meetup_default_url = "https://upload.wikimedia.org/wikipedia/commons/8/80/Meetup_square.png"
-    eventbrite_default_url = "https://upload.wikimedia.org/wikipedia/commons/8/87/Eventbrite_wordmark_orange.jpg"
+
+    # ---------------------- DATABASE SAVE SEARCH QUERY ----------------------#
+
+    new_search = SearchInfo(cat_id=activity.category.cat_id, act_id=act_id, filter_by=filter_by, city=city, datetime=now)
+    db.session.add(new_search)
+    db.session.commit()
+    result_code = 'Add'
+    print "added"
+
+    # ---------------------- FUNCTION CONTINUES BELOW ----------------------#
+
+    MEETUP_IMG_URL = "/images/meetup_logo"
+    EVBRTE_IMG_URL = "/images/eb_logo"
 
     if mu_id != 0:
         events = query_mu(mu_id, lat, lon, filter_by)
@@ -225,22 +235,11 @@ def show_event_list():
             for event in events.results:
                 event_name = event.get("name")
                 event_url = event.get("event_url")
-                event_pic = event.get("group")
+                event_img = event.get("group").get("group_photo", {"photo_link": MEETUP_IMG_URL}).get("photo_link", MEETUP_IMG_URL)
                 event_id = event.get("id")
 
-                if event_pic is None:
-                    event_deets = [event_name, event_url, meetup_default_url, event_id] 
-                    event_details.append(event_deets)
-
-                else:
-                    event_pic = event_pic.get("group_photo")
-                    if event_pic is not None:
-                        event_pic = event_pic.get("photo_link")
-                        event_deets = [event_name, event_url, event_pic, event_id]
-                        event_details.append(event_deets)
-                    else:
-                        event_deets = [event_name, event_url, meetup_default_url, event_id]
-                        event_details.append(event_deets)
+                event_deets = [event_name, event_url, event_img, event_id]
+                event_details.append(event_deets)
 
         return render_template("meetup_events.html",
                                 event_details=event_details)
@@ -250,11 +249,9 @@ def show_event_list():
 
         if eb_sub_id != str(0):
             events = query_eb_subcat(eb_cat_id, filter_value, eb_sub_id, location)
-
             
         else:
             events = query_eb_formats(eb_cat_id, filter_value, eb_format_id, location)
-
 
         if events.get("events") == [] or events.get("events") is None:
             flash('Sorry there are no events at this time!')
@@ -265,22 +262,17 @@ def show_event_list():
             for event in event_list:
                 event_name = event.get("name").get("text")
                 event_url = event.get("url")
-                event_img = event.get("logo")
+                event_img = event.get("logo", EVBRTE_IMG_URL).get("original", {"photo_link": EVBRTE_IMG_URL}).get("url", EVBRTE_IMG_URL)
                 event_id = event.get("id")
                 
-                if event_img is None:
-                    event_deets = [event_name, event_url, eventbrite_default_url, event_id]
-                    event_details.append(event_deets)
-                else:
-                    event_img = event_img.get("original").get("url")
-                    event_deets = [event_name, event_url, event_img, event_id]
-                    event_details.append(event_deets)
-    
+                event_deets = [event_name, event_url, event_img, event_id]
+                event_details.append(event_deets)
+
             return render_template("eventbevents.html",
                                 event_details=event_details)
 
 
-# ------------------------------------------------------------- #
+# --------------------------------------------------------------------------- #
 
 @app.route("/save_event.json", methods=["POST"])
 def save_event():

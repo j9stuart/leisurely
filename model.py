@@ -12,6 +12,7 @@ class Category(db.Model):
     cat_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     name = db.Column(db.String(80), nullable=False)
     screenname = db.Column(db.String(80), nullable=False)
+    img_url = db.Column(db.String(200), nullable=False)
 
     weekdays = db.relationship("Weekday",
                                 secondary="weekday_categories",
@@ -70,6 +71,7 @@ class Activity(db.Model):
 
         return "<Activity: {}>".format(self.name)
 
+
 class User(db.Model):
     """List of users who have created accounts"""
 
@@ -78,6 +80,7 @@ class User(db.Model):
     user_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     email = db.Column(db.String(80), nullable=False)
     password = db.Column(db.String(80), nullable=False)
+
 
 class SavedEvent(db.Model):
     """List of saved events to be mapped to users"""
@@ -93,8 +96,24 @@ class SavedEvent(db.Model):
     user = db.relationship('User', backref=db.backref('saved_events', order_by=saved_id))
 
 
+class SearchInfo(db.Model):
+    """ List of users' search history to improve user experience """
 
+    __tablename__ = "search_info"
 
+    search_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    cat_id = db.Column(db.Integer,
+                       db.ForeignKey('categories.cat_id'),
+                       nullable=False)
+    act_id = db.Column(db.Integer,
+                       db.ForeignKey('activities.act_id'),
+                       nullable=False)
+    filter_by = db.Column(db.Integer, nullable=False)
+    city = db.Column(db.String(80), nullable=False)
+    datetime = db.Column(db.DateTime, nullable=True)
+
+    category = db.relationship('Category', backref='searches')
+    activity = db.relationship('Activity', backref='searches')
 
 
 ###############################################################################
