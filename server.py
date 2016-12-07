@@ -1,6 +1,7 @@
 from os import environ
 import eventbrite
 from flask import Flask, render_template, request, jsonify, redirect, flash, session
+from flask_compress import Compress
 from flask_debugtoolbar import DebugToolbarExtension
 import pusher
 import sys
@@ -31,13 +32,15 @@ eventbrite = eventbrite.Eventbrite(auth_token)
 meetup = meetup.api.Client(mu_token)
 google_maps = GoogleMaps(api_key=geo_code)
 geo_api = geo_code
+compress = Compress()
 
 #Instantiate the pusher object. The pusher library pushes actions to the browser
 # when they occur. 
 p = pusher.Pusher(app_id=pusher_app_id, key=pusher_key, secret=pusher_secret)
 
 app = Flask(__name__)
-app.debug = True
+Compress(app)
+app.debug = False
 app.jinja_env.undefined = StrictUndefined
 app.secret_key = "leisure"
 
@@ -59,7 +62,7 @@ def index():
         category_pic = category.img_url
         category_list.append((category_name, category_pic))
 
-    # Generate a random list of 5 categories to dispaly from dictionary
+    # Generate a random list of 5 categories to display from dictionary
     category_list = random.sample(category_list, 5) 
     weekday = weekday.name
 
@@ -140,6 +143,9 @@ def submit_account():
 
     email = request.form.get("email")
     password = request.form.get("password")
+    first_name = request.form.get("first_name")
+    last_name = request.form.get("last_name")
+
     user = User.query.filter_by(email=email).all()
 
     if not is_email_address_valid(email):
@@ -149,7 +155,7 @@ def submit_account():
         if not user:
             password = password.encode('utf-8')
             password = hashpw(password, gensalt())
-            new_user = User(email=email, password=password)
+            new_user = User(email=email, password=password, first_name=first_name, last_name=last_name)
             db.session.add(new_user)
             db.session.commit()
             flash("Congratulations! You successfully created an account!")
@@ -182,7 +188,8 @@ def show_activities():
     activity_list = {}
     for activity in category.activities:
         activity_name = activity.name
-        activity_list[activity_name] = activity.act_id
+        img_url = activity.img_url
+        activity_list[activity_name] = [activity.act_id, img_url]
 
     return jsonify(activity_list)
 
@@ -222,8 +229,8 @@ def show_event_list():
 
     # ---------------------- FUNCTION CONTINUES BELOW ----------------------#
 
-    MEETUP_IMG_URL = "/images/meetup_logo"
-    EVBRTE_IMG_URL = "/images/eb_logo"
+    MEETUP_IMG_URL = "static/meetup_logo.png"
+    EVBRTE_IMG_URL = "static/eb_logo.jpg"
 
     if mu_id != 0:
         events = query_mu(mu_id, lat, lon, filter_by)
@@ -262,7 +269,11 @@ def show_event_list():
             for event in event_list:
                 event_name = event.get("name").get("text")
                 event_url = event.get("url")
-                event_img = event.get("logo", EVBRTE_IMG_URL).get("original", {"photo_link": EVBRTE_IMG_URL}).get("url", EVBRTE_IMG_URL)
+                event_img = event.get("logo")
+                if event_img is None:
+                    event_img = EVBRTE_IMG_URL
+                else:
+                    event_img = event_img.get("original", {}).get("url", EVBRTE_IMG_URL)
                 event_id = event.get("id")
                 
                 event_deets = [event_name, event_url, event_img, event_id]
@@ -282,6 +293,8 @@ def save_event():
     event_name = request.form.get("event_name")
     event_url = request.form.get("event_url")
     user_id = int(session["user_id"])
+    event_pic = request.form.get("event_pic")
+    print event_pic
 
     old_saved_event = SavedEvent.query.filter(SavedEvent.event_id == event_id, SavedEvent.user_id == user_id).all()
 
@@ -294,7 +307,7 @@ def save_event():
         print "deleted" 
 
     else:
-        new_saved_event = SavedEvent(user_id=user_id, event_id=event_id, event_name=event_name, event_url=event_url)
+        new_saved_event = SavedEvent(user_id=user_id, event_id=event_id, event_name=event_name, event_url=event_url, event_pic=event_pic)
         db.session.add(new_saved_event)
         db.session.commit()
         result_code = 'Add'
@@ -319,9 +332,9 @@ def show_saved_events():
 
 
 if __name__ == "__main__":
-    app.debug = True
+    app.debug = False
     app.jinja_env.auto_reload = True
     connect_to_db(app)
 
     DebugToolbarExtension(app)
-    app.run(host='0.0.0.0', debug=True)
+    app.run(host='0.0.0.0')

@@ -3,7 +3,7 @@
 {% block content %}
 <h3>Saved Events:</h3>
 
-<ul>
+<ul style="list-style-type: none;">
     {% for event in saved_events %}
     <li><a href="{{ event.event_url }}"> {{ event.event_name }}</a></li>
     {% endfor %}

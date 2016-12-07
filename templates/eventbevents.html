@@ -2,21 +2,24 @@
 {% extends 'base.html' %}
 
 {% block content %}
-  <div>
-    <h3>Take your pick:</h3>
-      <ul>
-        {% for event in event_details %}
-          <li id="results">
-            <a href="{{ event[1] }}" target="_blank">
-              <div style="padding: 2em;" class="row col-lg-2"><img src="{{ event[2] }}" alt="event_photo" width="100%" height="150px"><p>{{ event[0] }}</p></div>
-            </a>
-          </li>
-          {% if "user_id" in session %}
-            <button class="save-btn" id="{{ event[3] }}" name="{{ event[0] }}" value="{{ event[1] }}"><span class="glyphicon glyphicon-bookmark"></span>Save Event</button>
+
+  <div class="container">
+    <ul>
+      {% for event in event_details %}
+      <li id="event-pics" style="display: inline;">
+        <a href="{{ event[1] }}" target="_blank">
+          <div style="padding: 2em; height: 250px; margin: 2em; border: solid;" class="row col-lg-3"><img src="{{ event[2] }}" alt="event_photo" width="100%" height="150px"><p style="text-align: center; height: 50px; padding-top: 10px;">{{ event[0] }}</p></a><br> {% if "user_id" in session %}
+            <button style="align: center;" class="save-btn" id="{{ event[3] }}" name="{{ event[0] }}" value="{{ event[1] }}" form="{{ event[2] }}"><span id="bookmark" class="glyphicon glyphicon-bookmark"></span> Save Event</button>
+            <!-- AddToAny BEGIN -->
+            <a class="a2a_dd" href="https://www.addtoany.com/share"><button style="color: blue; float: right;"><span id="share" class="glyphicon glyphicon-share"></span> Share Event</button></a>
+<!-- AddToAny END -->
           {% endif %}
-        {% endfor %}
-      </ul> 
+        </div>
+      </li> 
+        {% endfor %}       
+    </ul> 
   </div>
+    
 
  
 {% endblock %}
@@ -26,11 +29,16 @@
   function saveEvent (evt) {
     evt.preventDefault();
 
-    $.post('/save_event.json', {'event_id': this.id, 'event_name': this.name, 'event_url': this.value}, function (results) {
+    var button = $(this)
+    var button = button[0]
+    console.log(button)
+    $.post('/save_event.json', {'event_id': button.id, 'event_name': button.name, 'event_url': button.value, 'event_pic': button.form}, function (results) {
       if (results.code == "Delete") {
+        $(button).attr("style", "color: black;")
         console.log("You deleted this from the database");
       }
       else {
+        $(button).attr("style", "color: green;")
         console.log("You added this to your favorites");
       }
     });
@@ -38,5 +46,8 @@
 
 $(".save-btn").on('click', saveEvent);
 
+
+
 </script>
+<script async src="https://static.addtoany.com/menu/page.js"></script>
 {% endblock %}

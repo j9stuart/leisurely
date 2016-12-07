@@ -5,7 +5,6 @@ from model import WeekdayCategory
 from model import Activity
 from datetime import datetime
 import re
-
 from model import connect_to_db, db
 from server import app
 
@@ -101,7 +100,7 @@ def load_activities():
     # Read category.csv file and insert data
     for row in open("seed_data/activities.csv"):
         row = row.rstrip()
-        act_id, cat_id, eb_cat_id, name, act_type, eb_format_id, sub_cat, mu_id = row.split(",")
+        act_id, cat_id, eb_cat_id, name, act_type, eb_format_id, sub_cat, mu_id, img_url = row.split(",")
 
         activity = Activity(act_id=act_id, 
                             cat_id=cat_id,
@@ -110,7 +109,8 @@ def load_activities():
                             act_type=act_type,
                             eb_format_id=eb_format_id,
                             sub_cat=sub_cat,
-                            mu_id=mu_id)
+                            mu_id=mu_id,
+                            img_url=img_url)
 
         # Need to add to session to store 
         db.session.add(activity)
@@ -118,6 +118,7 @@ def load_activities():
     # Commit my work
 
     db.session.commit()
+
 
 if __name__ == "__main__":
     connect_to_db(app)

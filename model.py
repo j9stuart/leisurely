@@ -62,6 +62,7 @@ class Activity(db.Model):
     eb_format_id = db.Column(db.Integer, nullable=False)
     sub_cat = db.Column(db.String(80), nullable=True)
     mu_id = db.Column(db.Integer, nullable=False)
+    img_url = db.Column(db.String(200), nullable=False)
     
     category = db.relationship('Category', backref='activities')
 
@@ -80,6 +81,8 @@ class User(db.Model):
     user_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     email = db.Column(db.String(80), nullable=False)
     password = db.Column(db.String(80), nullable=False)
+    first_name = db.Column(db.String(80), nullable=False)
+    last_name = db.Column(db.String(80), nullable=False)
 
 
 class SavedEvent(db.Model):
@@ -92,6 +95,7 @@ class SavedEvent(db.Model):
     event_id = db.Column(db.BigInteger, nullable=False)
     event_name = db.Column(db.String(200), nullable=False)
     event_url = db.Column(db.String(200), nullable=False)
+    event_pic = db.Column(db.String(200), nullable=False)
 
     user = db.relationship('User', backref=db.backref('saved_events', order_by=saved_id))
 
@@ -116,13 +120,14 @@ class SearchInfo(db.Model):
     activity = db.relationship('Activity', backref='searches')
 
 
+
 ###############################################################################
 
 def connect_to_db(app):
     """Connect the database to our Flask app."""
 
     # Configure the PstgreSQL database
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///leisurely'
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///leisurely?client_encoding=latin1'
     db.app = app
     db.init_app(app)
 

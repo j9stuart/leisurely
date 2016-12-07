@@ -35,8 +35,8 @@ google_maps = GoogleMaps(api_key=geo_code)
 geo_api = geo_code
 
 
-MEETUP_IMG_URL = "/images/meetup_logo"
-EVBRTE_IMG_URL = "/images/eb_logo"
+MEETUP_IMG_URL = "static/meetup_logo.png"
+EVBRTE_IMG_URL = "static/eb_logo.jpg"
 
 
 
@@ -131,6 +131,7 @@ def query_mu(mu_id, lat, lon, filter_by):
         events = meetup.GetOpenEvents(category=mu_id, lat=lat, lon=lon, fields="group_photo")
 
     return events
+
 
 
                 

@@ -1,40 +1,40 @@
-1,1,103,Festivals,Festival,5,0,0
-2,1,103,Concerts,Performance,6,0,0
-3,1,103,Meetups,Music,0,0,21
-4,1,103,Dance Parties,Party,11,0,0
-5,1,103,Classes,Class,9,0,0
-6,2,101,Networking,Networking,10,0,0
-7,2,101,Seminars,Seminar,2,0,0
-8,2,101,Meetups,Career & Business,0,0,2
-9,2,101,Conferences,Conference,1,0,0
-10,2,101,Classes,Class,9,0,0
-11,3,110,Classes,Class,9,0,0
-12,3,110,Festivals,Festival,5,0,0
-13,3,110,Meetups,Food & Drink,0,0,10
-14,3,110,Beer,NULL,0,10001,0
-15,3,110,Wine,NULL,0,10002,0
-16,4,105,Performance,Performance,6,0,0
-17,4,105,Classes,Class,9,0,0
-18,4,105,Meetups,Arts & Culture,0,0,1
-19,4,105,Festivals,Festival,5,0,0
-20,4,105,Seminars,Seminar,2,0,0
-21,5,108,Classes,Class,9,0,0
-22,5,108,Running,Race,15,0,0
-23,5,108,Meetups,Sports & Recreation,0,0,32
-24,5,108,Games & Matches,Game,14,0,0
-25,5,108,Special Events,Party,11,0,0
-26,6,102,Classes,Class,9,0,0
-27,6,102,Conferences,Conference,1,0,0
-28,6,102,Meetups,Tech,0,0,34
-29,6,102,Networking,Networking,10,0,0
-30,6,102,Seminars,Seminar,2,0,0
-31,7,109,Hiking,NULL,0,9001,0
-32,7,109,Tours,Tour,16,0,0
-33,7,109,Meetups,Outdoors & Adventure,0,0,23
-34,7,109,Classes,Class,9,0,0
-35,7,109,Retreats,Retreat,18,0,0
-36,8,111,Education,NULL,0,11008,0
-37,8,111,The Environment,NULL,0,11002,0
-38,8,111,Poverty Alleviation,NULL,0,11006,0
-39,8,111,Animal Welfare,NULL,0,11001,0
-40,8,111,Human Rights,NULL,0,11004,0
+1,1,103,Festivals,Festival,5,0,0,static/music_festival.jpg
+2,1,103,Concerts,Performance,6,0,0,static/concerts.jpeg
+3,1,103,Meetups,Music,0,0,21,static/music_meetup.jpg
+4,1,103,Dance Parties,Party,11,0,0,static/music_party.jpg
+5,1,103,Classes,Class,9,0,0,static/music_classes.jpg
+6,2,101,Networking,Networking,10,0,0,static/business_networking.jpg
+7,2,101,Seminars,Seminar,2,0,0,static/business_seminar.jpg
+8,2,101,Meetups,Career & Business,0,0,2,static/business_meetup.jpeg
+9,2,101,Conferences,Conference,1,0,0,static/business_conference.jpg
+10,2,101,Classes,Class,9,0,0,static/business_classes.jpg
+11,3,110,Classes,Class,9,0,0,static/food_class.jpg
+12,3,110,Festivals,Festival,5,0,0,static/food_festival.jpg
+13,3,110,Meetups,Food & Drink,0,0,10,static/food_meetup.jpeg
+14,3,110,Beer,NULL,0,10001,0,static/food_beer.jpg
+15,3,110,Wine,NULL,0,10002,0,static/food_wine.jpeg
+16,4,105,Performance,Performance,6,0,0,static/art_performance.jpeg
+17,4,105,Classes,Class,9,0,0,static/art_class.jpeg
+18,4,105,Meetups,Arts & Culture,0,0,1,static/art_meetup.jpg
+19,4,105,Festivals,Festival,5,0,0,static/art_festival.jpeg
+20,4,105,Seminars,Seminar,2,0,0,static/art_seminar.jpg
+21,5,108,Classes,Class,9,0,0,static/sports_classes.jpg
+22,5,108,Running,Race,15,0,0,static/sports_running.jpg
+23,5,108,Meetups,Sports & Recreation,0,0,32,static/sports_meetup.jpeg
+24,5,108,Games & Matches,Game,14,0,0,static/sports_games.jpg
+25,5,108,Special Events,Party,11,0,0,static/sports_events.jpg
+26,6,102,Classes,Class,9,0,0,static/tech_classes.JPG
+27,6,102,Conferences,Conference,1,0,0,static/tech_conference.jpg
+28,6,102,Meetups,Tech,0,0,34,static/tech_meetup.jpg
+29,6,102,Networking,Networking,10,0,0,static/tech_networking.jpg
+30,6,102,Seminars,Seminar,2,0,0,static/tech_seminar.jpg
+31,7,109,Hiking,NULL,0,9001,0,static/outdoors_hiking.jpeg
+32,7,109,Tours,Tour,16,0,0,static/outdoors_tour.JPG
+33,7,109,Meetups,Outdoors & Adventure,0,0,23,static/outdoors_meetup.jpg
+34,7,109,Classes,Class,9,0,0,static/outdoors_classes.jpeg
+35,7,109,Retreats,Retreat,18,0,0,static/outdoors_retreat.jpg
+36,8,111,Education,NULL,0,11008,0,static/charity_education.jpeg
+37,8,111,The Environment,NULL,0,11002,0,static/charity_environment.jpg
+38,8,111,Poverty Alleviation,NULL,0,11006,0,static/charity_poverty.jpg
+39,8,111,Animal Welfare,NULL,0,11001,0,static/charity_animals.jpg
+40,8,111,Human Rights,NULL,0,11004,0,static/charity_humanrights.jpeg

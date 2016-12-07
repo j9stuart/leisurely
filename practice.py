@@ -13,7 +13,6 @@ class Event(db.Model):
     eb_category_id = db.Column(db.Integer, nullable=False)
     mu_category_id = db.Column(db.Integer, nullable=False)
 
-
 def load_events():
     """Load events from eventbrite & meetup into database"""
 
@@ -56,7 +55,6 @@ def load_events():
     db.session.commit()
 
 
-
 def seed_events(source):
     """ Creates table for all eventbrite and meetup events """
     event_details = []
@@ -65,24 +63,30 @@ def seed_events(source):
     if source == "eventbrite":
         while i <= 50:
             source = 1
-            events = eventbrite.get("/events/search/?location.address=san%20francisco&page="+str(i))
+            events = eventbrite.get("/events/search/?location.address=austin&page="+str(i))
             event_list = events.get("events")
             for event in event_list:
                 event_name = event.get("name").get("text")
                 event_url = event.get("url")
-                event_img = event.get("logo", EVBRTE_IMG_URL).get("original", {"photo_link": EVBRTE_IMG_URL}).get("url", EVBRTE_IMG_URL)
+                event_img = event.get("logo")
+                if event_img is None:
+                    event_img = EVBRTE_IMG_URL
+                else:
+                    event_img = event_img.get("original", {}).get("url", EVBRTE_IMG_URL)
+
                 source_event_id = event.get("id")
                 description = event.get("description").get("text")
                 uc_time = event.get("start").get("utc")
                 time = datetime.datetime.strptime(uc_time, '%Y-%m-%dT%H:%M:%SZ')
                 start_time = time.strftime('%Y-%m-%d %H:%M:%S')
-                eb_category_id = event.get("category_id")
+                # eb_category_id = event.get("category_id")
+                eb_category_id = 0
                 mu_category_id = 0
 
                 event_deets = [event_name, event_url, event_img, source_event_id, description, start_time, eb_category_id, mu_category_id]
                 event_details.append(event_deets)
                 i += 1
-
+        print event_details
         return event_details
 
 
@@ -105,4 +109,3 @@ def seed_events(source):
             event_details.append(event_deets)
 
         return event_details
-
