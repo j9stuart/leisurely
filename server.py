@@ -1,24 +1,23 @@
-from os import environ
+from bcrypt import hashpw, gensalt
+import datetime
 import eventbrite
 from flask import Flask, render_template, request, jsonify, redirect, flash, session
 from flask_compress import Compress
 from flask_debugtoolbar import DebugToolbarExtension
-import pusher
-import sys
-import json
-from pprint import pprint
-import requests
-from jinja2 import StrictUndefined
-import datetime
-import random
-from model import connect_to_db, db, Category, Weekday, WeekdayCategory, Activity, User, SavedEvent, SearchInfo
-import meetup.api
+from functions import is_email_address_valid, check_password, query_eb_subcat, query_eb_formats, get_filter_value, query_mu
+import geocoder
 from geolocation.main import GoogleMaps
 from geolocation.distance_matrix.client import DistanceMatrixApiClient
-from bcrypt import hashpw, gensalt
-import geocoder
+from jinja2 import StrictUndefined
+import json
+import meetup.api
+from model import connect_to_db, db, Category, Weekday, WeekdayCategory, Activity, User, SavedEvent, SearchInfo
+from os import environ
+from pprint import pprint
+import random
 import re
-from db_funct import is_email_address_valid, check_password, query_eb_subcat, query_eb_formats, get_filter_value, query_mu
+import requests
+import sys
 
 auth_token = environ['EVENTBRITE_OAUTH_TOKEN']
 pusher_app_id = environ['PUSHER_APP_ID']
@@ -34,15 +33,14 @@ google_maps = GoogleMaps(api_key=geo_code)
 geo_api = geo_code
 compress = Compress()
 
-#Instantiate the pusher object. The pusher library pushes actions to the browser
-# when they occur. 
-p = pusher.Pusher(app_id=pusher_app_id, key=pusher_key, secret=pusher_secret)
-
 app = Flask(__name__)
 Compress(app)
 app.debug = False
 app.jinja_env.undefined = StrictUndefined
 app.secret_key = "leisure"
+
+MEETUP_IMG_URL = "static/assets/meetup_logo.png"
+EVBRTE_IMG_URL = "static/assets/eb_logo.jpg"
 
 
 # ----------------------------- ROUTES ---------------------------------- #
@@ -52,7 +50,7 @@ app.secret_key = "leisure"
 def index():
     """This the app homepage view"""
     category_list = []
-       # Get today's date
+    # Get today's date
     weekday = datetime.datetime.today().isoweekday()
     # Get the day of the week where Monday = 1
     # Query database to get weekday categories and their associated activities
@@ -62,7 +60,7 @@ def index():
         category_pic = category.img_url
         category_list.append((category_name, category_pic))
 
-    # Generate a random list of 5 categories to display from dictionary
+    # Generate a random list of 5 categories to display from dictionary based on weekday
     category_list = random.sample(category_list, 5) 
     weekday = weekday.name
 
@@ -229,9 +227,9 @@ def show_event_list():
 
     # ---------------------- FUNCTION CONTINUES BELOW ----------------------#
 
-    MEETUP_IMG_URL = "static/meetup_logo.png"
-    EVBRTE_IMG_URL = "static/eb_logo.jpg"
-
+    MEETUP_IMG_URL = "static/assets/meetup_logo.png"
+    EVBRTE_IMG_URL = "static/assets/eb_logo.jpg"
+     
     if mu_id != 0:
         events = query_mu(mu_id, lat, lon, filter_by)
         

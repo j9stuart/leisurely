@@ -1,48 +1,48 @@
 # Functions to be used for server file
-
-from os import environ
+from bcrypt import hashpw, gensalt
+import datetime
 import eventbrite
 from flask import Flask, render_template, request, jsonify, redirect, flash, session
+from flask_compress import Compress
 from flask_debugtoolbar import DebugToolbarExtension
-import pusher
-import sys
-import json
-from pprint import pprint
-import requests
-from jinja2 import StrictUndefined
-import datetime
-import random
-from model import connect_to_db, db, Category, Weekday, WeekdayCategory, Activity, User, SavedEvent
-import meetup.api
+import geocoder
 from geolocation.main import GoogleMaps
 from geolocation.distance_matrix.client import DistanceMatrixApiClient
-from bcrypt import hashpw, gensalt
-import geocoder
+from jinja2 import StrictUndefined
+import json
+import meetup.api
+from model import connect_to_db, db, Category, Weekday, WeekdayCategory, Activity, User, SavedEvent, SearchInfo
+from os import environ
+from pprint import pprint
+import random
 import re
+import requests
+import sys
 
 auth_token = environ['EVENTBRITE_OAUTH_TOKEN']
 pusher_app_id = environ['PUSHER_APP_ID']
-pusher_key = environ['PUSHER_KEY']
-pusher_secret = environ['PUSHER_SECRET']
 mu_token = environ['MEETUP_API_KEY']
 geo_code = environ['GEOCODE_API_KEY']
 
 
-# Instantiate the Eventbrite and Meetup API clients.
+# Instantiate the Eventbrite, GoogleMaps, and Meetup API clients.
 eventbrite = eventbrite.Eventbrite(auth_token)
 meetup = meetup.api.Client(mu_token)
 google_maps = GoogleMaps(api_key=geo_code)
 geo_api = geo_code
 
+# Email Validation Check
+EMAIL_VALIDATOR = "^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$"
 
-MEETUP_IMG_URL = "static/meetup_logo.png"
-EVBRTE_IMG_URL = "static/eb_logo.jpg"
+# Default Images for Eventbrite and Meetup events
+MEETUP_IMG_URL = "static/assets/meetup_logo.png"
+EVBRTE_IMG_URL = "static/assets/eb_logo.jpg"
 
 
 
 def is_email_address_valid(email):
     """Validate the email address using a regex."""
-    if not re.match("^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$", email):
+    if not re.match(EMAIL_VALIDATOR, email):
         return False
     return True
 
