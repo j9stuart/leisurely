@@ -223,12 +223,8 @@ def show_event_list():
     db.session.add(new_search)
     db.session.commit()
     result_code = 'Add'
-    print "added"
 
     # ---------------------- FUNCTION CONTINUES BELOW ----------------------#
-
-    MEETUP_IMG_URL = "static/assets/meetup_logo.png"
-    EVBRTE_IMG_URL = "static/assets/eb_logo.jpg"
      
     if mu_id != 0:
         events = query_mu(mu_id, lat, lon, filter_by)
