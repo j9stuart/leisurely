@@ -1,6 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
 
-db = SQLAlchemy()
+db = SQLAlchemy(use_native_unicode=False)
 
 ###############################################################################
 
@@ -119,6 +119,20 @@ class SearchInfo(db.Model):
     category = db.relationship('Category', backref='searches')
     activity = db.relationship('Activity', backref='searches')
 
+# class Event(db.Model):
+#     """List of all events in San Francisco"""
+
+#     __tablename__ = "events"
+
+#     event_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+#     event_name = db.Column(db.UnicodeText, nullable=False)
+#     event_url = db.Column(db.UnicodeText, nullable=False)
+#     event_img = db.Column(db.UnicodeText, nullable=False)
+#     source_event_id = db.Column(db.BigInteger, nullable=False)
+#     description = db.Column(db.UnicodeText, nullable=False)
+#     start_time = db.Column(db.DateTime, nullable=True)
+#     eb_category_id = db.Column(db.Integer, nullable=False)
+#     mu_category_id = db.Column(db.Integer, nullable=False)
 
 
 ###############################################################################
@@ -127,7 +141,8 @@ def connect_to_db(app):
     """Connect the database to our Flask app."""
 
     # Configure the PstgreSQL database
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///leisurely?client_encoding=latin1'
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///leisurely?client_encoding=utf8'
+    app.config['SQLALCHEMY_NATIVE_UNICODE'] = False
     db.app = app
     db.init_app(app)
 

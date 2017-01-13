@@ -63,7 +63,7 @@ def seed_events(source):
     if source == "eventbrite":
         while i <= 50:
             source = 1
-            events = eventbrite.get("/events/search/?location.address=austin&page="+str(i))
+            events = eventbrite.get("/events/search/?location.address=94102&page="+str(i))
             event_list = events.get("events")
             for event in event_list:
                 event_name = event.get("name").get("text")
@@ -79,8 +79,8 @@ def seed_events(source):
                 uc_time = event.get("start").get("utc")
                 time = datetime.datetime.strptime(uc_time, '%Y-%m-%dT%H:%M:%SZ')
                 start_time = time.strftime('%Y-%m-%d %H:%M:%S')
-                # eb_category_id = event.get("category_id")
-                eb_category_id = 0
+                eb_category_id = event.get("category_id")
+                # eb_category_id = 0
                 mu_category_id = 0
 
                 event_deets = [event_name, event_url, event_img, source_event_id, description, start_time, eb_category_id, mu_category_id]

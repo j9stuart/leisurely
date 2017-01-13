@@ -1,13 +1,9 @@
-from sqlalchemy import func
-from model import Category
-from model import Weekday
-from model import WeekdayCategory
-from model import Activity
 from datetime import datetime
+from functions import seed_events
+from model import Category, Weekday, WeekdayCategory, Activity, connect_to_db, db
 import re
-from model import connect_to_db, db
 from server import app
-
+from sqlalchemy import func
 
 
 def load_categories():
@@ -119,6 +115,47 @@ def load_activities():
 
     db.session.commit()
 
+# def load_events():
+#     """Load events from eventbrite & meetup into database"""
+
+#     print "Events"
+
+#     Event.query.delete()
+
+#     event_details = seed_events("eventbrite")
+
+#     for line in event_details:
+#         event_name, event_url, event_img, source_event_id, description, start_time, eb_category_id, mu_category_id = line
+
+#         event = Event(event_name=event_name,
+#                       event_url=event_url,
+#                       event_img=event_img,
+#                       source_event_id=source_event_id,
+#                       description=description,
+#                       start_time=start_time,
+#                       eb_category_id=eb_category_id,
+#                       mu_category_id=mu_category_id,)
+
+#         db.session.add(event)
+
+#     event_details2 = seed_events("meetup")
+
+#     for line in event_details:
+#         event_name, event_url, event_img, source_event_id, description, start_time, eb_category_id, mu_category_id = line
+
+#         event = Event(event_name=event_name,
+#                       event_url=event_url,
+#                       event_img=event_img,
+#                       source_event_id=source_event_id,
+#                       description=description,
+#                       start_time=start_time,
+#                       eb_category_id=eb_category_id,
+#                       mu_category_id=mu_category_id,)
+        
+#         db.session.add(event)
+
+#     db.session.commit()
+
 
 if __name__ == "__main__":
     connect_to_db(app)
@@ -126,8 +163,10 @@ if __name__ == "__main__":
     # In case tables haven't been created, create them
     db.create_all()
 
+
     # Import different types of data
-    load_categories()
+    load_categories()  
     load_weekdays()
-    load_weekdaycategory()
+    load_weekdaycategory() 
     load_activities()
+    # load_events()
